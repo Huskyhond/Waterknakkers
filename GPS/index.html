@@ -1,6 +1,26 @@
-<iframe src="osm.html" width="100%" height="100%"></iframe>
+<div id="frame_one_holder" style="display: block">
+    <iframe src="osm.html" width="100%" height="100%" id="frame"></iframe>
+</div>
+<div id="frame_two_holder" style="display: none">
+    <iframe src="osm.html" width="100%" height="100%" id="frametwo"></iframe>
+</div>
 <script type="text/javascript">
-setTimeout(function() {
-location.reload();
+setInterval(function() {
+    var iframe = document.getElementById('frame');
+    var iframe2 = document.getElementById('frametwo');
+    if(document.getElementById('frame_one_holder').style.display == "block") {
+        document.getElementById('frame_one_holder').style.display = "none";
+        document.getElementById('frame_two_holder').style.display = "block";
+        setTimeout(function() {
+            iframe.src = iframe.src;
+        }, 2000);
+    }
+    else {
+        document.getElementById('frame_two_holder').style.display = "none";
+        document.getElementById('frame_one_holder').style.display = "block";
+        setTimeout(function() {
+            iframe2.src = iframe2.src;
+        }, 2000);
+    }
 }, 5000);
 </script>
