@@ -8,11 +8,11 @@ https://www.tinkerforge.com/en/doc/Downloads.html#downloads-tools
 Na de installatie open je de Brick Viewer en bekijk je de UID, deze pas je aaan in het python script van de Tinkerforge module.
 
 #### Pip requirements
-smopy 
+folium
 tinkerforge
 
-#### Wat doet Smopy?
-Smopy visualiseert de boot zijn positie op OpenStreetView dmv een Python library.
+#### Wat doet Folium?
+Folium visualiseert de boot zijn positie op OpenStreetView dmv een Python library.
 
 #### Wat doet Tinkerforge?
 Tinkerforge is de library die alle bricks laat communiceren met elkaar in Python.
