@@ -1,0 +1,3 @@
+pip:
+  smopy
+  tinkerforge

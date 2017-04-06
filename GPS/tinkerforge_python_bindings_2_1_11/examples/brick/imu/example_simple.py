@@ -3,7 +3,7 @@
 
 HOST = "localhost"
 PORT = 4223
-UID = "XXYYZZ" # Change XXYYZZ to the UID of your IMU Brick
+UID = "62Bous" # Change XXYYZZ to the UID of your IMU Brick
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.brick_imu import BrickIMU
