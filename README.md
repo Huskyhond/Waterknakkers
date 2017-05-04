@@ -1,5 +1,7 @@
 # Waterknakkers
 
+[![Stories in Ready](https://badge.waffle.io/Huskyhond/Waterknakkers.svg?label=ready&title=Ready)](http://waffle.io/Huskyhond/Waterknakkers)
+
 ### GPS Module
 #### Tinkerforge Setup
 Voor de Tinkerforge setup dien je eerst de Daemon en Viewer te installeren:
