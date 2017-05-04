@@ -1,26 +1,71 @@
-<div id="frame_one_holder" style="display: block">
-    <iframe src="osm.html" width="100%" height="100%" id="frame"></iframe>
-</div>
-<div id="frame_two_holder" style="display: none">
-    <iframe src="osm.html" width="100%" height="100%" id="frametwo"></iframe>
-</div>
-<script type="text/javascript">
-setInterval(function() {
-    var iframe = document.getElementById('frame');
-    var iframe2 = document.getElementById('frametwo');
-    if(document.getElementById('frame_one_holder').style.display == "block") {
-        document.getElementById('frame_one_holder').style.display = "none";
-        document.getElementById('frame_two_holder').style.display = "block";
-        setTimeout(function() {
-            iframe.src = iframe.src;
-        }, 2000);
-    }
-    else {
-        document.getElementById('frame_two_holder').style.display = "none";
-        document.getElementById('frame_one_holder').style.display = "block";
-        setTimeout(function() {
-            iframe2.src = iframe2.src;
-        }, 2000);
-    }
-}, 5000);
-</script>
+<html>
+    <head>
+        <title>GPS REFREHSER</title>
+        
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.css' rel='stylesheet' />
+        <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+        <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+        <style>
+            #map {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map">
+
+        </div>
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.js'></script>
+        <script
+              src="https://code.jquery.com/jquery-3.2.1.min.js"
+              integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+              crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            function readFile(map) {
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        var arr = xmlhttp.responseText.match(/[^\r\n]+/g);
+                        for(var i = 0; i < arr.length; i++) {
+                            var splitted = arr[i].split(',');
+                            var isDuplicate = false;
+                            for(var j = 0; j < markers.length; j++) {
+                                var marker = markers[j];
+                                if(marker[0] == splitted[0] && marker[1] == splitted[1]) {
+                                    isDuplicate = true;
+                                }
+                            }
+                            if(!isDuplicate) {
+                                if(i < arr.length-2)
+                                    L.circle(splitted, 1).addTo(map);
+                                else
+                                    L.marker(splitted).addTo(map);
+                                markers.push(splitted);
+                            }
+                        }
+                    }
+                }
+
+                xmlhttp.open("GET", "coords.txt", true);
+                xmlhttp.send();
+            }
+
+
+            L.mapbox.accessToken = 'pk.eyJ1IjoiaHVza3lob25kIiwiYSI6ImNqMmFibjd3cDAwMDkzM21laXBncDN0bGgifQ.bBUvToPnn5_wAP12kmwJyw';
+            var markers = [];
+            var map = L.mapbox.map('map', 'mapbox.light')
+              .setView([51.8980995, 4.4171458], 16);
+           
+            var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+
+            setInterval(function() {
+                readFile(map);
+            }, 1000);
+            
+
+            var marker = new mapboxgl.Marker()
+              .setLngLat([30.5, 50.5])
+              .addTo(map);
+        </script>
+    </body>
+</html>
