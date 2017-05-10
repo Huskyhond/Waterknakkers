@@ -5,12 +5,14 @@
 //Transmit
 //SDBPT = Depth
 //SDDBT = Depth below Transducer
+//TX = Blue
+//RX = Brown
 
 //#include <PString.h>
 #include <SoftwareSerial.h>  
 #include <nmea.h>  
    
- SoftwareSerial nmeaSerial(10,11,true); // RX pin, TX pin (not used), and true means we invert the signal  
+ SoftwareSerial nmeaSerial(19,18,true); // RX pin, TX pin (not used), and true means we invert the signal  
  NMEA nmeaDecoder(ALL);   
    
  void setup()  
