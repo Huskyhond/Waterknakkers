@@ -1,8 +1,8 @@
 import folium
 import pandas as pd
 import time
-coordX = 51.8980995
-coordY = 4.4171458
+coordX = 51.89855
+coordY = 4.418458
 
 
 def RefreshMap():
