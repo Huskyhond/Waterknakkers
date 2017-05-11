@@ -8,7 +8,7 @@
 //TX = Blue
 //RX = Brown
 
-//#include <PString.h>
+#include <PString.h>
 #include <SoftwareSerial.h>  
 #include <nmea.h>  
    
@@ -23,34 +23,38 @@
    
  void loop()  
  {  
-    if (nmeaSerial.available() > 0 ) {  
+  /*  if (nmeaSerial.available() > 0 ) {
+      Serial.print("test2");
       if (nmeaDecoder.decode(nmeaSerial.read())) {  
-        Serial.println(nmeaDecoder.sentence());  
+        Serial.println(nmeaDecoder.sentence());
+        Serial.print("tst");  
       }  
     }
+  */
 
-//  if (Serial2.available()) {  
-//    if (nmeaDecoder.decode(Serial2.read())) {
-//      char* title = nmeaDecoder.term(0);  
-//      if (strcmp(title,"SDDBT") == 0) {            // only run the following code if the incoming sentence is MTW  
-//        Serial.println(nmeaDecoder.sentence());     // prints the original in Celsius  
-//        float depth = atof(nmeaDecoder.term(1));     // declares a float from a string   
-//   
-//        // Time to assemble the sentence  
-//        char mtwSentence [18];                      // the MTW sentence can be up to 18 characters long  
-//        byte cst;  
-//        PString strt(mtwSentence, sizeof(mtwSentence));  
-//        strt.print("SDDBT,");  
-//        strt.print(depth);  
-//        strt.print(",M");  
-//        cst = checksum(mtwSentence);  
-//        if (cst < 0x10) strt.print('0');            // Arduino prints 0x007 as 7, 0x02B as 2B, so we add it now  
-//          strt.print(cst, HEX);  
-//          Serial.println(mtwSentence);  
-//        }  
-//    }  
-//  }
- }
+ //if (nmeaSerial.available()) {  
+  if (nmeaDecoder.decode(nmeaSerial.read())) {
+    char* title = nmeaDecoder.term(0);  
+    if (strcmp(title,"SDDBT") == 0) {            // only run the following code if the incoming sentence is MTW  
+      Serial.println(nmeaDecoder.sentence());     // prints the original in Celsius  
+      float depth = atof(nmeaDecoder.term(1));     // declares a float from a string   
+      
+      // Time to assemble the sentence  
+      char mtwSentence [18];                      // the MTW sentence can be up to 18 characters long  
+      byte cst;  
+      PString strt(mtwSentence, sizeof(mtwSentence));  
+      strt.print("SDDBT,");  
+      strt.print(depth);  
+      strt.print(",M");  
+      cst = checksum(mtwSentence);  
+      if (cst < 0x10) strt.print('0');            // Arduino prints 0x007 as 7, 0x02B as 2B, so we add it now  
+        strt.print(cst, HEX);  
+        Serial.println(mtwSentence);  
+      }  
+    }  
+  }
+ //}
+ 
 
 // calculate checksum function (thanks to https://mechinations.wordpress.com)  
 byte checksum(char* str)   
