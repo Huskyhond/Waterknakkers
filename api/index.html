@@ -1,0 +1,16 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://localhost');
+  socket.on('message', function (data) {
+    document.getElementById('motor_one').innerHTML = data.motors[0];
+    document.getElementById('motor_two').innerHTML = data.motors[1];
+    document.getElementById('rudder').innerHTML = data.rudder;
+    socket.emit('my other event', { my: 'data' });
+  });
+</script>
+
+<body>
+    <div>Motor 1: <span id="motor_one">0</span>
+    <div>Motor 2: <span id="motor_two">0</span>
+    <div>Rudder: <span id="rudder">0</span>
+</body>
