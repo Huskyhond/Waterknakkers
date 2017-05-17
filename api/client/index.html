@@ -1,0 +1,33 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="client/controller.js"></script>
+<script src="client/jquery.min.js"></script>
+<script>
+    var socket = io.connect('http://localhost');
+    socket.on('message', function (data) {
+        document.getElementById('motor_one').innerHTML = data.motors[0];
+        document.getElementById('motor_two').innerHTML = data.motors[1];
+        document.getElementById('rudder').innerHTML = data.rudder;
+        socket.emit('my other event', { my: 'data' });
+    });
+
+    $(document).ready(function() {
+        $('input[type=radio][name=controller]').change(function() {
+            if (this.value == 'c1') {
+                controllerConfig = configOne;
+            }
+            else if (this.value == 'c2') {
+                controllerConfig = configTwo;
+            }
+        });
+    });
+</script>
+
+<body>
+    <form action="">
+        <input type="radio" name="controller" value="c1" checked="checked"> Config One<br>
+        <input type="radio" name="controller" value="c2"> Config Two<br>
+    </form>
+    <div>Motor 1: <span id="motor_one">0</span></div>
+    <div>Motor 2: <span id="motor_two">0</span></div>
+    <div>Rudder: <span id="rudder">0</span></div>
+</body>
