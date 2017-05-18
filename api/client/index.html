@@ -2,12 +2,43 @@
 <script src="client/controller.js"></script>
 <script src="client/jquery.min.js"></script>
 <script>
+    var boats = [];
+    var boatSelected = '';
     var socket = io.connect('http://localhost');
+    socket.emit('getBoats');
     socket.on('message', function (data) {
         document.getElementById('motor_one').innerHTML = data.motors[0];
         document.getElementById('motor_two').innerHTML = data.motors[1];
         document.getElementById('rudder').innerHTML = data.rudder;
-        socket.emit('my other event', { my: 'data' });
+        
+    });
+
+    socket.on('getBoats', function(boatsin) {
+        console.log(boats);
+        console.log(boatsin);
+        for(var i in boatsin.boats) {
+            boats.push(boatsin.boats[i]);
+        }
+        updateBoats();
+    });
+
+    socket.on('boatConnected', function(boat) {
+        boats.push(boat.boat);
+        updateBoats();
+    });
+
+    socket.on('boatDisconnected', function(boat) {
+        console.log('dced', boat);
+        for(var i in boats) {
+            var _boat = boats[i];
+            console.log(_boat);
+            console.log(_boat.id, boat.id);
+            if(_boat.id == boat.id) {
+                console.log('dced boat ' + i);
+                boats.splice(i, 1);
+            }
+        }
+        updateBoats();
     });
 
     $(document).ready(function() {
@@ -19,7 +50,41 @@
                 controllerConfig = configTwo;
             }
         });
+
+        $('#boatRadios').on('change', 'input[type=radio][name=boats]', function() {
+            boatSelected = this.value;
+        });
+
     });
+
+    function updateBoats() {
+        var parent = $("#boatRadios");
+        parent.empty();
+        for(var i in boats) {
+            var div = $('<div>', {
+                class: 'boats',
+                id: 'boat' + i
+            });
+            var boat = boats[i].name;
+            var radio = $("<input>", {
+                type: "radio",
+                name: "boats",
+                value: boat.id
+            }).appendTo(div);
+            
+            if(boats[i].id == boatSelected){
+                radio.attr('checked', 'checked');
+                boatSelected = boats[i].id;
+            }
+            else if(i == 0 && boatSelected == '') {
+                radio.attr('checked', 'checked');
+                boatSelected = boats[i].id;
+            }
+
+            $("<span>").html(" " + boat).appendTo(div);
+            div.appendTo(parent);
+        }
+    }
 </script>
 
 <body>
@@ -27,6 +92,12 @@
         <input type="radio" name="controller" value="c1" checked="checked"> Config One<br>
         <input type="radio" name="controller" value="c2"> Config Two<br>
     </form>
+    <fieldset>
+        <legend>Boats</legend>
+        <form id="boatRadios" action="">
+
+        </form>
+    </fieldset>
     <div>Motor 1: <span id="motor_one">0</span></div>
     <div>Motor 2: <span id="motor_two">0</span></div>
     <div>Rudder: <span id="rudder">0</span></div>
