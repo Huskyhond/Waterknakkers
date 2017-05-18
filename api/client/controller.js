@@ -109,6 +109,19 @@ var configTwo = {
     }
 }
 
+
+var configThree = {
+    calculateMotion: function(xbone) {
+        xbone = configOne.calibrate(xbone);
+        var leftEngine = xbone.xLeft == 0 ? xbone.yLeft*-1 : xbone.yLeft*-1 + xbone.xLeft;
+        var rightEngine = xbone.xLeft == 0 ? xbone.yLeft*-1 : xbone.yLeft*-1 - xbone.xLeft;
+        var rudder = xbone.xRight;
+        return { leftEngine: leftEngine, rightEngine: rightEngine, rudder: rudder}
+    }
+}
+
+
+
 var controllerConfig = configOne;
 
 function updateStatus() {

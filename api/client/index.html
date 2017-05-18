@@ -49,6 +49,9 @@
             else if (this.value == 'c2') {
                 controllerConfig = configTwo;
             }
+            else if (this.value = 'c3'){
+                controllerConfig = configThree;
+            }
         });
 
         $('#boatRadios').on('change', 'input[type=radio][name=boats]', function() {
@@ -91,6 +94,7 @@
     <form action="">
         <input type="radio" name="controller" value="c1" checked="checked"> Config One<br>
         <input type="radio" name="controller" value="c2"> Config Two<br>
+        <input type="radio" name="controller" value="c3"> Config Three<br>
     </form>
     <fieldset>
         <legend>Boats</legend>
