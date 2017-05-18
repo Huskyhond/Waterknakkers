@@ -1,0 +1,19 @@
+<html>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    var socket = io();
+    socket.on('connect', function(){
+        socket.emit('authentication', {username: 'john', password: 'secret'});
+        socket.on('authenticated', function(){
+
+        });
+    });
+</script>
+
+<body>
+    <p id="test">Memes</p>
+    <input id="button" type="button" value="test" >
+</body>
+
+</html>
