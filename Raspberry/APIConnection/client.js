@@ -6,7 +6,11 @@ socket.on('connect', function(){
     socket.emit('boatreq', {
         id: config.id,
         name: config.name
-    });
+    })
+
+    socket.on('controller', function(data) {
+        console.log(data)
+    })
 });
 
 socket.on('disconnect', function(){

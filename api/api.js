@@ -11,7 +11,7 @@ class Api {
     }
 
     onMotion(motion) {
-        console.log(motion)
+        instance.io.sockets.emit('controller', motion)
     }
 
     joinBoat(options) {
