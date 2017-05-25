@@ -10,8 +10,21 @@ class Api {
         instance.connections.push(socket)
     }
 
-    onMotion(motion) {
-        instance.io.sockets.emit('controller', { timestamp: Date.now() , motion: motion })
+    getConnection(id) {
+	for(var i = 0; i < instance.connections.length; i++) {
+		if(instance.connections[i].boatId == id) {
+			return instance.connections[i]
+		}
+	}
+	return false;
+    }
+
+    onMotion(data) {
+	console.log('Sending data to boat: ' + data.boat)
+	var socket = instance.getConnection(data.boat)
+	if(socket) {
+            socket.emit('controller', { timestamp: Date.now() , motion: data.motion })
+    	}
     }
 
     joinBoat(options) {

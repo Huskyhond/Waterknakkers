@@ -139,7 +139,7 @@ function updateStatus() {
         var motion = controllerConfig.calculateMotion(xboneController);
         setMotionInHtml(motion);
         if(motion.leftEngine != oldMotion.leftEngine || motion.rightEngine != oldMotion.rightEngine || motion.rudder != oldMotion.rudder) {
-            socket.emit('controller', motion);
+            socket.emit('controller', {boat: boatSelected, motion: motion});
         }
         oldMotion = motion;
     }
