@@ -56,6 +56,7 @@
         var parent = $("#boatRadios");
         parent.empty();
         for(var i in boats) {
+	    console.log(boats[i]);
             var div = $('<div>', {
                 class: 'boats',
                 id: 'boat' + i
@@ -63,9 +64,8 @@
             var boat = boats[i].name;
             var radio = $("<input>", {
                 type: "radio",
-                name: "boats",
-                value: boat.id
-            }).appendTo(div);
+                name: "boats"
+            }).val(boats[i].id).appendTo(div);
             
             if(boats[i].id == boatSelected){
                 radio.attr('checked', 'checked');
@@ -84,9 +84,9 @@
 
 <body>
     <form action="">
-        <input type="radio" name="controller" value="c1" checked="checked"> Config One<br>
-        <input type="radio" name="controller" value="c2"> Config Two<br>
-        <input type="radio" name="controller" value="c3"> Config Three<br>
+        <input type="radio" name="controller" value="c1" checked="checked"> Config One <i>(RT) Forward, (LT) Backwards, (Analog Right) Rudder, (Analog Left) Motor</i><br>
+        <input type="radio" name="controller" value="c2"> Config Two <i>(RT) Engine Right, (LT) Engine Left, (RB) Engine Right Reverse, (LB) Engine Left Reverse, (Analog Left) Rudder</i><br>
+        <input type="radio" name="controller" value="c3"> Config Three <i>(Left Analog) Motor speed & rotation, (Right Analog) Rudder</i><br>
     </form>
     <fieldset>
         <legend>Boats</legend>
