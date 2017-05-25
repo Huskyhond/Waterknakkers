@@ -9,7 +9,7 @@ var io = require('socket.io').listen(server)
 
 
 //listen to ip address and port defined in the config.js file
-server.listen(config.listenPort, config.listenAddress, function(){
+server.listen(config.listenPort,  function(){
     console.log('secure web server is running at https://'+config.listenAddress+':'+config.listenPort)
 })
 
