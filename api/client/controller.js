@@ -109,6 +109,26 @@ var configTwo = {
     }
 }
 
+
+var configThree = {
+    calibrate: function(xbone) {
+        xbone.xLeft = (xbone.xLeft < 0.15 && xbone.xLeft > - 0.15) ? 0 : xbone.xLeft;
+        xbone.xRight = (xbone.xRight < 0.15 && xbone.xRight > - 0.15) ? 0 : xbone.xRight;
+        xbone.yLeft = (xbone.yLeft < 0.15 && xbone.yLeft > - 0.15) ? 0 : xbone.yLeft;
+        xbone.yRight = (xbone.yRight < 0.15 && xbone.yRight > - 0.15) ? 0 : xbone.yRight;
+        return xbone;
+    },
+    calculateMotion: function(xbone) {  
+        xbone = configThree.calibrate(xbone);
+        var leftEngine = xbone.yLeft*-1 + xbone.xLeft;
+        var rightEngine = xbone.yLeft*-1 - xbone.xLeft;
+        var rudder = xbone.xRight;
+        return { leftEngine: leftEngine, rightEngine: rightEngine, rudder: rudder}
+    }
+}
+
+
+
 var controllerConfig = configOne;
 
 function updateStatus() {

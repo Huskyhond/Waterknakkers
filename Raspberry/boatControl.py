@@ -2,7 +2,16 @@ import serial
 from time import sleep
 import numpy as np
 from pyparsing import*
+from brick_imu import IPConnection
+from brick_imu import BrickIMU
 
+HOST = "localhost"
+PORT = 4223
+UID = "XXYYZZ" # Change XXYYZZ to the UID of your IMU Brick
+CURRENT_SPEED = 50
+
+def cb_quaternion(w, x, y, z):
+    print("w: {:.02f}, x: {:.02f}, y: {:.02f}, z: {:.02f}".format(w/16383.0, x/16383.0, y/16383.0, z/16383.0))
 
 class Control:
     def __init__(self, port='/dev/ttyACM0',baudrate=115200):
@@ -13,6 +22,16 @@ class Control:
             sleep(3)
             print(self.ser.read(self.ser.inWaiting()))
             self.connected = True
+
+            #Start IMU Brick
+            self.ipcon = IPConnection()
+            self.imu = BrickIMUV2(UID, ipcon)
+            ipcon.connect(HOST, PORT)
+
+            imu.register_callback(imu.CALLBACK_QUATERNION, cb_quaternion)
+            imu.set_quaternion_period(100)
+            
+
 
         except:
             print('Opening Serial port failed, try again or try another port.')
@@ -86,6 +105,12 @@ class Control:
         angle = np.clip(angle, -100, 100) / 2
         self.rudderL = self.rudderR = 90 + angle
         self.write()
+
+    #Boris
+    def ConstantSpeed(self):
+        speed = CURRENT_SPEED
+        ax, ay, az = imu.get_acceleration
+        return "Acceleration[X]: " + str(ax) + "Acceleration[Y]: " + str(ay) + "Acceleration[Z]: " + str(az)
 
     '''
     def Forwards(self, speed):
