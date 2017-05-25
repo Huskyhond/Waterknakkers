@@ -11,10 +11,11 @@ class Api {
     }
 
     onMotion(motion) {
-        instance.io.sockets.emit('controller', motion)
+        instance.io.sockets.emit('controller', { timestamp: Date.now() , motion: motion })
     }
 
     joinBoat(options) {
+	console.log("Boat connected")
         this.name = options.name
         this.boatId = options.id
         this.isBoat = true
