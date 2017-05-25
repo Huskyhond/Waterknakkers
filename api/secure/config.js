@@ -1,9 +1,9 @@
 var fs = require('fs')
 
 var address = '127.0.0.1'
-var port = '3000'
-var privateKey = fs.readFileSync('/etc/letsencrypt/live/waterknakkers.niekeichner.nl/privkey.pem', 'utf8')
-var certificate = fs.readFileSync('/etc/letsencrypt/live/waterknakkers.niekeichner.nl/cert.pem', 'utf8')
+var port = '8443'
+var privateKey = fs.readFileSync('cert/key.pem', 'utf8')
+var certificate = fs.readFileSync('cert/cert.pem', 'utf8')
 
 module.exports = {
 
@@ -11,7 +11,7 @@ module.exports = {
 
     listenPort : port,
 
-    httpsCredentials: {key: privateKey, cert: certificate }
+    httpsCredentials: {key: privateKey, cert: certificate, passphrase: "waterknakkers" }
 
 
     //var privateKey = fs.readFileSync('cert/key.pem', 'utf8')

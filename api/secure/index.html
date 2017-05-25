@@ -6,7 +6,7 @@
     socket.on('connect', function(){
         socket.emit('authentication', {username: 'john', password: 'secret'});
         socket.on('authenticated', function(){
-
+            
         });
     });
 </script>

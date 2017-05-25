@@ -16,6 +16,7 @@ findUser : function(username){
             console.log(rows)
         }else{
             console.log(err)
+            return rows
         }
     })
 }
