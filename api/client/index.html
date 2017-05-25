@@ -1,3 +1,4 @@
+<title>Waterknakkers Client</title>
 <script src="/socket.io/socket.io.js"></script>
 <script src="client/controller.js"></script>
 <script src="client/jquery.min.js"></script>
@@ -6,12 +7,6 @@
     var boatSelected = '';
     var socket = io();
     socket.emit('getBoats');
-    socket.on('message', function (data) {
-        document.getElementById('motor_one').innerHTML = data.motors[0];
-        document.getElementById('motor_two').innerHTML = data.motors[1];
-        document.getElementById('rudder').innerHTML = data.rudder;
-        
-    });
 
     socket.on('getBoats', function(boatsin) {
         console.log(boats);
@@ -28,13 +23,10 @@
     });
 
     socket.on('boatDisconnected', function(boat) {
-        console.log('dced', boat);
+        var boat = boat.boat;
         for(var i in boats) {
             var _boat = boats[i];
-            console.log(_boat);
-            console.log(_boat.id, boat.id);
             if(_boat.id == boat.id) {
-                console.log('dced boat ' + i);
                 boats.splice(i, 1);
             }
         }
