@@ -9,7 +9,11 @@ socket.on('connect', function(){
     })
 
     socket.on('controller', function(data) {
-        console.log(data)
+        //console.log(data)
+	var now = Date.now()
+	var delay = now - data.timestamp
+	console.log("Delay in ms:", delay, data.timestamp, now)
+	
     })
 });
 
