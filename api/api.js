@@ -6,6 +6,10 @@ class Api {
         this.connections = []
     }
 
+    setDatabase(db) {
+        this.db = db
+    }
+
     addConnection(socket) {
         instance.connections.push(socket)
     }

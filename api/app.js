@@ -1,16 +1,25 @@
-var app = require('express')()
+var express = require('express')
+var app = express()
 var server = require('http').Server(app)
 var io = require('socket.io')(server)
 var endpoints = require('./endpoints')(app)
 var api = require('./api')(io)
+var MongoClient = require('mongodb').MongoClient
 
-server.listen(3000, function() {
-  console.log('Listening on port 3000')
+console.log('Waiting for database to connect before starting server...')
+MongoClient.connect('mongodb://localhost:27017/waterknakkers', function(err, db) {
+  api.setDatabase(db)
+  console.log('Database connected')
+ 
+  server.listen(3000, function() {
+    console.log('Listening on port 3000')
+  })
+
 })
 
-app.get('/', endpoints.root)
-app.get('/client/controller.js', endpoints.clientController)
-app.get('/client/jquery.min.js', endpoints.jQuery)
+
+app.use(express.static(__dirname + '/client'))
+app.get('/location/:boatId', endpoints.getBoatCoordinates)
 
 io.on('connection', function(socket) {
     api.addConnection(socket)

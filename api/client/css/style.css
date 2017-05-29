@@ -1,0 +1,117 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+#container {
+    color: white;
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;  
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+/* Base */
+
+#left {
+    vertical-align: top;
+    display: inline-block;
+    width: 19.5%;
+    height: 100%
+}
+
+#right {
+    display: inline-block;
+    width: 80%;
+    height: 100%;
+}
+
+.ib {
+    display: inline-block;
+}
+
+.third {
+    width: 32%;
+    text-align: center;
+}
+
+.title {
+    margin-bottom: 5px;
+}
+
+/* Map */
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/* Controller css */
+
+.connected_box {
+    font-weight: bold;
+    font-size: 9px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 900px;
+    width: 50px;
+    height: 50px;
+    border: 2px solid white;
+}
+
+.radios_holder {
+    margin-top: 50px;
+}
+
+.boat_selector_holder {
+    margin-top: 50px;
+}
+
+.connected_box.disconnected {
+    background-color: red;
+}
+
+.connected_box.connected {
+    background-color: green;
+}
+
+#controller_status {
+    margin-left: 24px;
+    width: 65%;
+}
+
+.controller_radio {
+    display: inline-block;
+}

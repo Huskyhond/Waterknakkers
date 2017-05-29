@@ -19,6 +19,9 @@ var rAF = window.mozRequestAnimationFrame ||
     window.requestAnimationFrame;
 
 function connecthandler(e) {
+    console.log('connected', e);
+    $('.connected_box').addClass("connected");
+    $('.connected_box').removeClass("disconnected");
     addgamepad(e.gamepad);
 }
 
@@ -28,6 +31,9 @@ function addgamepad(gamepad) {
 }
 
 function disconnecthandler(e) {
+    console.log('disconnected');
+    $('.connected_box').addClass("disconnected");
+    $('.connected_box').removeClass("connected");
     removegamepad(e.gamepad);
 }
 
@@ -147,7 +153,6 @@ function updateStatus() {
 }
 
 function setMotionInHtml(motion) {
-    console.log(motion);
     $('#motor_one').html(motion.leftEngine);
     $('#motor_two').html(motion.rightEngine);
     $('#rudder').html(motion.rudder);
