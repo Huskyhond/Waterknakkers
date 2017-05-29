@@ -61,9 +61,21 @@ class Api {
         this.emit('getBoats', { boats: boats })  
     }
 
+    parseInformation(data) {
+        if(typeof(data) !== 'object' || !data.sensors || !data.location)
+            return
+        var collection = this.db.collection('boatData')
+        var _this = this; // Socket this.
+        collection.insert(data, function(err, result) {
+            if(result.result.n == 1) {
+                _this.emit('info', data)
+            }
+        })
+    }
+
 }
 
 module.exports = function(io) {
     instance = new Api(io)
-    return instance;
+    return instance
 }
