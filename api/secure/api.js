@@ -3,11 +3,16 @@ var config = require('./config.js')
 var endpoint = require('./endpoint')
 var db = require('./database.js')
 
-//setup http webserver with socket.io
+//setup https webserver with socket.io
 var bodyParser = require('body-parser')
 var app = require('express')()
 var server = require('https').createServer(config.httpsCredentials, app)
 var io = require('socket.io').listen(server)
+
+app.use(bodyParser.json()) // support JSON-encoded post bodies
+app.use(bodyParser.urlencoded({ // support x-www-form-url encoded post bodies
+    extended : true
+}))
 
 //listen to ip address and port defined in the config.js file
 server.listen(config.listenPort,  function(){
@@ -16,8 +21,9 @@ server.listen(config.listenPort,  function(){
 
 //request paths to api calls
 app.get('/', endpoint.serveIndex)
-app.post('/auth', endpoint.auth)
+app.post('/login', endpoint.login)
 
+// authentication algorithm for websockets
 require('socketio-auth')(io, {
     authenticate : function(socket, data, callback){
         var username = data.username
