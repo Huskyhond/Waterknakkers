@@ -19,7 +19,7 @@ MongoClient.connect('mongodb://localhost:27017/waterknakkers', function(err, db)
 
 
 app.use(express.static(__dirname + '/client'))
-app.get('/location/:boatId', endpoints.getBoatCoordinates)
+//app.get('/location', endpoints.getBoatCoordinates)
 
 io.on('connection', function(socket) {
     api.addConnection(socket)
