@@ -4,9 +4,9 @@
 <script>
     var socket = io();
     socket.on('connect', function(){
-        socket.emit('authentication', {username: 'john', password: 'secret'});
+        socket.emit('authentication', {token : 'ffe90abb6fe572ba05a3b21231a71a1ecebabb45' });
         socket.on('authenticated', function(){
-            
+            console.log('presistent connected')
         });
     });
 </script>

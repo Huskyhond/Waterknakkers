@@ -26,8 +26,11 @@ app.post('/login', endpoint.login)
 // authentication algorithm for websockets
 require('socketio-auth')(io, {
     authenticate : function(socket, data, callback){
-        var username = data.username
-        var password = data.password
+        db.getValidToken(data.token, function(err, rows, fields){
+            if(rows[0].tokenExists){
+                 return callback(null, true)
+            }
+        })
     }
 })
 
