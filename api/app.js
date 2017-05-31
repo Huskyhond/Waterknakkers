@@ -32,4 +32,6 @@ io.on('connection', function(socket) {
     socket.on('getBoats', api.getBoats)
 
     socket.on('disconnect', api.disconnect)
+
+    socket.on('info', api.parseInformation)
 })

@@ -20,6 +20,7 @@ time, mark, audio, video {
 }
 
 #container {
+    white-space:nowrap;
     color: white;
     background-color: black;
     width: 100%;
@@ -46,16 +47,18 @@ time, mark, audio, video {
 /* Base */
 
 #left {
+    float: left;
+    min-width: 360px;
+    margin-top: 5px;
+    margin-left: 5px;
     vertical-align: top;
-    display: inline-block;
     width: 19.5%;
     height: 100%
 }
 
 #right {
-    display: inline-block;
-    width: 80%;
-    height: 100%;
+    width: 1920px;
+    float: right;
 }
 
 .ib {

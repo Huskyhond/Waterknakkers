@@ -1,9 +1,6 @@
 #from ultraSonic import Ping
 import math
 
-
- #Sensors perpendicular to wall, angled to wall, forward
-
 def calcBoatAngle(sensorDistances, sensorDegrees = 45):
     correctDistance = sensorDistances[0] / math.cos(sensorDegrees)
     errorDistance = sensorDistances[1] - correctDistance
@@ -14,16 +11,28 @@ def calcBoatAngle(sensorDistances, sensorDegrees = 45):
     return angle
 
 
-def adjustBoat():
-    boatAngle = calcBoatAngle([2,7,1])
-    print(boatAngle)    
+def adjustBoat(motorPower = 50):
+    boatAngle = calcBoatAngle([4,5,1]) #insert ping sensor distances here
+    motorL = 100
+    motorR = 100
     
-    if boatAngle < 0:
+    if boatAngle < 0: #Steer boat to right
         print("Steer Right")
-    else:
+        motorR = 100 + (100 - ((1 - (boatAngle / 90)) * 100))
+
+    else: #Steer boat to left
         print("Steer Left")
+        motorL = (1 - (boatAngle / 90)) * 100
 
+    motorL = round(motorPower * (motorL/100))
+    motorR = round(motorPower * (motorR/100))
+    
+    print("Boat angle:",boatAngle)    
+    print("MotorL:",motorL)
+    print("MotorR:",motorR)
 
+    return [motorL,motorR]
+    
 
 adjustBoat()
 

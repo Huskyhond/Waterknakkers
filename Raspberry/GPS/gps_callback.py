@@ -28,10 +28,8 @@ def line_pre(fileName, line, max_lines = 10):
 def cb_coordinates(latitude, ns, longitude, ew, pdop, hdop, vdop, epe):
     latStr = str(latitude/1000000.0)
     lngStr = str(longitude/1000000.0)
-    print("Latitude: " + latStr + "° " + ns)
-    print("Longitude: " + lngStr + "° " + ew)
-    print("")
-    line_pre('coords.txt', latStr + "," + lngStr)
+    
+    print(latStr + "," + lngStr)
 
 if __name__ == "__main__":
     ipcon = IPConnection() # Create IP connection
@@ -48,5 +46,5 @@ if __name__ == "__main__":
     #       if the coordinates has changed since the last call!
     gps.set_coordinates_callback_period(REFRESH_TIME)
 
-    input("Press key to exit\n") # Use input() in Python 3
-    ipcon.disconnect()
+#    input("Press key to exit\n") # Use input() in Python 3
+#    ipcon.disconnect()

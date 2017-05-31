@@ -75,3 +75,16 @@ function updateBoats() {
         div.appendTo(parent);
     }
 }
+
+var viewport = $( window ).width() - 5;
+var leftWidth = 360;
+$(document).ready(function() {
+    $("#left").width(leftWidth);
+    $("#right").width(viewport - leftWidth);
+});
+
+$(window).resize(function() {
+    viewport = $( window ).width() - 5;
+    $("#left").width(leftWidth);
+    $("#right").width(viewport - leftWidth);
+});
