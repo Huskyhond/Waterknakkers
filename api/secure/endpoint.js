@@ -3,53 +3,44 @@ var db = require('./database.js')
 
 module.exports = {
 
-    serveIndex : function(req, res, next){
+    serveIndex: function (req, res, next) {
         res.sendFile(__dirname + '/index.html')
     },
 
-    login : function(req, res, next){
+    login: function (req, res, next) {
 
-        db.authenticate(req.body.username, req.body.password, function(err, rows, fields){
-            if(rows[0].userExists){
+        db.authenticate(req.body.username, req.body.password, function (err, rows, fields) {
+            if (rows[0].userExists) {
                 var token = generateToken()
-                console.log(token)
                 db.putValidTokenInDatabase(token, req.body.username)
-                
+
                 res.setHeader('Content-Type', 'application/json')
                 res.write(
                     JSON.stringify({
                         'token': token
                     }))
-                
+
                 res.end()
             }
-            else{
+            else {
                 errorReceived(res, 1, 'invalid username or password')
             }
         })
-    },
-
-    auth : function(req, res, next){
-
-    },
-
-    logout : function(req, res, next){
-
-    }
+    }, 
 }
 
 // generate a pseudo-random 40 character string
-var generateToken = function(){
+var generateToken = function () {
     return crypto.randomBytes(20).toString('hex')
 }
 
 // return any error that occured to the user as a JSON response
-var errorReceived = function (res, errnum, err){
-	res.setHeader('Content-Type', 'application/json')
+var errorReceived = function (res, errnum, err) {
+    res.setHeader('Content-Type', 'application/json')
     res.write(
-		JSON.stringify({
-			'code' : errnum,
-			'error' : err
-		}));
-	res.end();  
+        JSON.stringify({
+            'code': errnum,
+            'error': err
+        }));
+    res.end();
 }

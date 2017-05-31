@@ -9,36 +9,48 @@ var app = require('express')()
 var server = require('https').createServer(config.httpsCredentials, app)
 var io = require('socket.io').listen(server)
 
+require('socketio-auth')(io, {
+    authenticate: authenticate, // auth function
+    postAuthenticate: postAuthenticate, // post auth function, what to do when connection is allowed
+    disconnect: disconnect, // disconnect function
+    timeout: 1000 // timeout in ms
+})
+
 app.use(bodyParser.json()) // support JSON-encoded post bodies
 app.use(bodyParser.urlencoded({ // support x-www-form-url encoded post bodies
-    extended : true
+    extended: true
 }))
 
 //listen to ip address and port defined in the config.js file
-server.listen(config.listenPort,  function(){
-    console.log('secure web server is running at https://'+config.listenAddress+':'+config.listenPort)
+server.listen(config.listenPort, function () {
+    console.log('secure web server is running at https://' + config.listenAddress + ':' + config.listenPort)
 })
 
-//request paths to api calls
+//request paths
 app.get('/', endpoint.serveIndex)
 app.post('/login', endpoint.login)
 
 // authentication algorithm for websockets
-require('socketio-auth')(io, {
-    authenticate : function(socket, data, callback){
-        db.getValidToken(data.token, function(err, rows, fields){
-            if(rows[0].tokenExists){
-                 return callback(null, true)
-            }
-        })
-    }
-})
-
-io.on('connection', function(socket){
-    socket.on('disconnect', function(data){
-        console.log("client disconnected")
+function authenticate(socket, data, callback) {
+    db.isTokenValid(data.token, function (err, rows, fields) {
+        if(err || !rows[0].isValid){
+            return callback(new Error('Invalid token'))
+        }else{
+            return callback(null, true) // null is error msg and true is authenticated
+        }
     })
-})
+}
+
+
+function postAuthenticate(socket, data){
+    socket.on('test', function(data){
+        console.log(data)
+    })
+}
+
+function disconnect(socket) {
+    console.log('client with socket id: ' + socket.id + ' disconnected')
+}
 
 
 

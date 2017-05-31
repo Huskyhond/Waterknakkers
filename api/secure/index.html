@@ -3,17 +3,26 @@
 
 <script>
     var socket = io();
-    socket.on('connect', function(){
-        socket.emit('authentication', {token : 'ffe90abb6fe572ba05a3b21231a71a1ecebabb45' });
-        socket.on('authenticated', function(){
-            console.log('presistent connected')
+    socket.on('connect', function () {
+        socket.emit('authentication', { token: '3fdbbacf2287706e340a4a228f725ffe853ae0aa' });
+        socket.on('authenticated', function () {
+            console.log('connected to server')
+        });
+
+        socket.on('unauthorized', function (err) {
+            console.log(err)
         });
     });
+
+    function buttonClicked() {
+        socket.emit('test', { hello: 'world' })
+    }
+
 </script>
 
 <body>
-    <p id="test">Memes</p>
-    <input id="button" type="button" value="test" >
+    <p id="test">Halllo</p>
+    <input id="button" type="button" value="test" onclick="buttonClicked()">
 </body>
 
 </html>
