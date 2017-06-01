@@ -1,7 +1,8 @@
 var config = require('./config')
 var socket = require('socket.io-client')(config.host)
 var PythonShell = require('python-shell')
-var pyshell = new PythonShell('../GPS/gps_callback.py')
+var gpspy = new PythonShell('../GPS/gps_callback.py')
+var controllerpy = new PythonShell('../boatController.py');
 var queue = []
 socket.on('connect', function(){
     console.log('connected')
@@ -15,7 +16,9 @@ socket.on('connect', function(){
     	var now = Date.now()
     	var delay = now - data.timestamp
     	console.log("Delay in ms:", delay, data.timestamp, now)
-	
+
+        var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
+        controllerpy.send(JSON.stringify(boatData))	
     })
 
     setInterval(function() {
@@ -25,18 +28,29 @@ socket.on('connect', function(){
         }
     }, 100)
 
-});
+})
 
 socket.on('disconnect', function(){
     console.log('disconnected')
 })
 
-pyshell.on('message', function (message) {
+controllerpy.send('');
+
+
+controllerpy.on('message', function(message){
+    console.log(message)
+})
+
+controllerpy.end(function(err) {
+    console.log(err)
+})
+
+gpspy.on('message', function (message) {
   // On rec of a coordinate.
   queue.append({ sensors: {}, location: message })
-});
+})
 
-pyshell.end(function (err) {
-  if (err) throw err;
-  console.log('finished');
-});
+gpspy.end(function (err) {
+  //if (err) throw err
+  console.log(err)
+})
