@@ -1,7 +1,7 @@
 var config = require('./config')
 var socket = require('socket.io-client')(config.host)
 var PythonShell = require('python-shell')
-var gpspy = new PythonShell('../GPS/gps_callback.py')
+//var gpspy = new PythonShell('../GPS/gps_callback.py')
 var controllerpy = new PythonShell('../boatController.py');
 var queue = []
 socket.on('connect', function(){
@@ -34,17 +34,11 @@ socket.on('disconnect', function(){
     console.log('disconnected')
 })
 
-controllerpy.send('');
-
-
 controllerpy.on('message', function(message){
     console.log(message)
 })
 
-controllerpy.end(function(err) {
-    console.log(err)
-})
-
+/*
 gpspy.on('message', function (message) {
   // On rec of a coordinate.
   queue.append({ sensors: {}, location: message })
@@ -52,5 +46,6 @@ gpspy.on('message', function (message) {
 
 gpspy.end(function (err) {
   //if (err) throw err
-  console.log(err)
+  //console.log(err)
 })
+*/
