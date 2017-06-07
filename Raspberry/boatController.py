@@ -3,7 +3,7 @@ import sys, json, math
 from time import sleep
 
 print('Running boat Controller')
-c = Control()
+c = Controller()
 
 def recMotorData(motorOne, motorTwo):
     c.Motor(motorOne, motorTwo)
@@ -19,7 +19,10 @@ while True:
 		engineLeft = jsonObj[0]
 		engineRight = jsonObj[1]
 		rudder = jsonObj[2]
-		recMotorData(engineLeft, engineRight)
-		recRudderData(rudder)
+		if c.controllable:
+			recMotorData(engineLeft, engineRight)
+			recRudderData(rudder)
+		else:
+			c.check()
         userinput =None 
 	sys.stdout.flush()

@@ -3,7 +3,7 @@ from time import sleep
 import numpy as np
 from pyparsing import*
 
-class Control:
+class Controller:
     def __init__(self, port='/dev/ttyACM0',baudrate=115200):
         try:
             self.ser=serial.Serial(port,baudrate)
@@ -12,9 +12,11 @@ class Control:
             sleep(3)
             print(self.ser.read(self.ser.inWaiting()))
             self.connected = True   
+            self.controllable = True
         except:
             print('Opening Serial port failed, try again or try another port.')
             self.connected = False
+            self.controllable = False
 
         self.motorL=90
         self.motorR=90
@@ -49,6 +51,7 @@ class Control:
         except:
             #no data received from arduino, or incorrect format
             print('Incorrect or empty echo from arduino received')
+            self.controllable = False
             return 0
 
         results=[int(antwoord[1]),int(antwoord[3]),int(antwoord[5]),int(antwoord[7])]
@@ -64,6 +67,14 @@ class Control:
             #data received from arduino was of correct format, but not correct values
             print('Incorrect echo from arduino received')
             return 0
+
+    def check(self):
+        self.Motor(0,0)
+        self.Rudder(0)
+        if self.write():
+            self.controllable = True
+        else:
+            self.controllable = False
 
 
     def Motor(self, motorL, motorR):
