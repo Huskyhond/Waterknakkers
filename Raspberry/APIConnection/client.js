@@ -2,7 +2,8 @@ var config = require('./config')
 var socket = require('socket.io-client')(config.host)
 var PythonShell = require('python-shell')
 //var gpspy = new PythonShell('../GPS/gps_callback.py')
-var controllerpy = new PythonShell('../boatController.py');
+var controllerpy = new PythonShell('../boatController.py')
+var controllable
 var queue = []
 socket.on('connect', function(){
     console.log('connected')
@@ -18,7 +19,10 @@ socket.on('connect', function(){
     	console.log("Delay in ms:", delay, data.timestamp, now)
 
         var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
-        controllerpy.send(JSON.stringify(boatData))	
+        // Dont bother the arduino if the delay between the sockets is too much.
+        if(delay > 200 && controllable) {
+            controllerpy.send(JSON.stringify(boatData))	
+        }
     })
 
     setInterval(function() {
@@ -36,6 +40,18 @@ socket.on('disconnect', function(){
 
 controllerpy.on('message', function(message){
     console.log(message)
+    var parse = undefined;
+    try {
+        parse = JSON.parse(message);
+    }
+    catch(e) {
+        // Not a json object, ignore..
+    }
+    if(parse) {
+        if(parse.controllable === true || parse.controllable === false) {
+            controllable = parse.controllable
+        }
+    }
 })
 
 /*
