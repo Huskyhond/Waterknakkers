@@ -1,6 +1,8 @@
 #--------------------------------
 #Boris van Norren
+#Hogeschool Rotterdam
 #0835560
+#TI3A
 #Waterknakkers
 #--------------------------------
 
