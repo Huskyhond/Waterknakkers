@@ -3,6 +3,7 @@
 #include <Servo.h>
 
 #define INPUT_SIZE 17
+#define debug = false
 
 Servo LinkerRoer;
 Servo RechterRoer;
@@ -116,7 +117,7 @@ void RC()
       while (Serial.available()>0)
         Serial.read();
 
-    }
+    } 
     
     digitalWrite(takeOverLED,LOW);
  
@@ -163,15 +164,19 @@ void rpi()
       RechterMotor.write(RM);
 
       //the program then echoes the received commands back to the sender over serial interface
-      Serial.print('a');
-      Serial.print(LR);
-      Serial.print('b');
-      Serial.print(RR);
-      Serial.print('c');  
-      Serial.print(LM);
-      Serial.print('d');  
-      Serial.print(RM);
-      Serial.print('z');   
+      if(debug)
+      {
+        Serial.print('a');
+        Serial.print(LR);
+        Serial.print('b');
+        Serial.print(RR);
+        Serial.print('c');  
+        Serial.print(LM);
+        Serial.print('d');  
+        Serial.print(RM);
+        Serial.print('z');   
+      }
+      
     }
     else
     {

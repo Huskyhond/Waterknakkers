@@ -5,10 +5,11 @@ from pyparsing import*
 
 class Controller:
     def __init__(self, port='/dev/ttyACM0',baudrate=115200):
+        self.debug = False
         try:
             self.ser=serial.Serial(port,baudrate)
             print('Serial port opened at:',port, 'baudrate:', baudrate)
-            print("Sleep...")
+            print("Warm-up...")
             sleep(3)
             print(self.ser.read(self.ser.inWaiting()))
             self.connected = True   
@@ -18,6 +19,7 @@ class Controller:
             self.connected = False
             self.controllable = False
 
+        print('Connected:',self.connected)
         self.motorL=90
         self.motorR=90
         self.rudderL=90
@@ -32,7 +34,7 @@ class Controller:
         #constructs a string to send to the arduino
         string = 'a'+str(int(self.rudderL))+'b'+str(int(self.rudderR))+'c'+str(int(self.motorL))+'d'+str(int(self.motorR))+'z'
         #send string to arduino
-        print('write:',string)
+        if debug: print('write:',string)
         self.ser.write(string)
         #wait 10 ms
         sleep(0.01)
@@ -40,7 +42,7 @@ class Controller:
         #print('Data naar arduino:', string)
         # read and print the echo from the arduino
         echo=self.ser.read(self.ser.inWaiting())
-        print('echo:',echo)
+        if debug: print('echo:',echo)
         #print('Data van arduino terug:',echo)
         # check is the echo is equal to the data send to the arduino
 
@@ -50,7 +52,7 @@ class Controller:
             antwoord=test.parseString(echo)
         except:
             #no data received from arduino, or incorrect format
-            print('Incorrect or empty echo from arduino received')
+            if debug: print('Incorrect or empty echo from arduino received')
             self.controllable = False
             return 0
 
@@ -65,7 +67,7 @@ class Controller:
             return 1
         else:
             #data received from arduino was of correct format, but not correct values
-            print('Incorrect echo from arduino received')
+            if debug: print('Incorrect echo from arduino received')
             return 0
 
     def check(self):
@@ -73,9 +75,6 @@ class Controller:
         self.Rudder(0)
         if self.write():
             self.controllable = True
-        else:
-            self.controllable = False
-
 
     def Motor(self, motorL, motorR):
         motorL = motorL * 100
@@ -85,8 +84,6 @@ class Controller:
         
         self.motorL=90+motorL
         self.motorR=90+motorR
-        print("L:",self.motorL,"R:",self.motorR)
-
         self.write()
 
 
