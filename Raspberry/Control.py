@@ -48,7 +48,7 @@ class Control:
             antwoord=test.parseString(echo)
         except:
             #no data received from arduino, or incorrect format
-            print('er ging iets mis')
+            print('Incorrect or empty echo from arduino received')
             return 0
 
         results=[int(antwoord[1]),int(antwoord[3]),int(antwoord[5]),int(antwoord[7])]
@@ -62,7 +62,7 @@ class Control:
             return 1
         else:
             #data received from arduino was of correct format, but not correct values
-            print('niet zo succesvol')
+            print('Incorrect echo from arduino received')
             return 0
 
 
@@ -84,70 +84,5 @@ class Control:
         angle = np.clip(angle, -100, 100) / 2
         self.rudderL = self.rudderR = 90 + angle
         self.write()
-
-    '''
-    def Forwards(self, speed):
-        """
-            Puts the motors in forward motion
-        """
-        speed=np.clip(speed,0,100)
-        self.motorL=90+(speed/100.*50.)
-        self.motorR=90+(speed/100.*50.)
-        self.write()
-
-    def Backwards(self, speed):
-        """
-            Puts the motors in backwards motion
-        """
-        speed=np.clip(speed,0,100)
-        self.motorL=90-(speed/100.*50.)
-        self.motorR=90-(speed/100.*50.)
-        self.write()
-
-    def SteerLeft(self, steer):
-        """
-            Steers the servos left
-        """
-        steer=np.clip(steer,0,100)
-        self.rudderL=90+(steer/100.*50.)
-        self.rudderR=90+(steer/100.*50.)
-        self.write()
-
-    def SteerRight(self, steer):
-        """
-            Steers the servos right
-        """
-        steer=np.clip(steer,0,100)
-        self.rudderL=90-(steer/100.*50.)
-        self.rudderR=90-(steer/100.*50.)
-        self.write()
-
-    def RotateRight(self,speed):
-        """
-            Rotates the boat by counterspinning the engines
-        """
-        speed=np.clip(speed,0,100)
-        self.motorL=90-(speed/100.*50.)
-        self.motorR=90+(speed/100.*50.)
-        self.write()
-
-    def RotateLeft(self,speed):
-        """
-            Rotates the boat by counterspinning the engines
-        """
-        speed=np.clip(speed,0,100)
-        self.motorL=90+(speed/100.*50.)
-        self.motorR=90-(speed/100.*50.)
-        self.write()
-
-    def SteerDeg(self,steer):
-        """
-            Steers the rudders by a certain deg
-        """
-        steer=np.clip(steer,-45,45)+90
-        self.rudderL=steer
-        self.rudderR=steer
-        self.write()
-    '''
 
     

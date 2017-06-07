@@ -35,7 +35,9 @@ class Ping:
     GPIO.output(self.GPIO_PINS[1][0], False)
     GPIO.output(self.GPIO_PINS[2][0], False)
 
+    #Set cleanup at exit
     atexit.register(exit_handler)
+    
     # Allow module to settle
     time.sleep(0.5)
 
@@ -56,6 +58,8 @@ class Ping:
     elapsed = stop-start
     distance = (elapsed * self.speedSound)/2
 
+    #Wait 20ms
+    time.sleep(0.02)
     return distance
 
     
