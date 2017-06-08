@@ -77,7 +77,8 @@ class Follow:
         # Keep adjusting the boat using the callback until running is set to false
         while self.running:
             if self.cb is not None:
-                self.cb(self.adjustBoat())
+                driveValues = self.adjustBoat()
+                self.cb(driveValues[0], driveValues[1], driveValues[2])
 
     def start(self):
         # Start thread to follow the quay wall
