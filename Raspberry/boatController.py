@@ -64,5 +64,4 @@ while True:
 			if f.running:
 				f.stop()
 
->>>>>>> e535343e6281d984967933a7dcff9df78f8e7aef
 	sys.stdout.flush()
