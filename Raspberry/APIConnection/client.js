@@ -34,7 +34,7 @@ var authenticatedOnly = function() {
 
     setInterval(function () {
         if (queue.length > 0) {
-            var data = queue.splice()
+            var data = queue.shift()
             socket.emit('info', data)
         }
     }, 100)
