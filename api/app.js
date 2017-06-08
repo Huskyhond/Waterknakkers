@@ -36,6 +36,7 @@ app.post('/login', api.authenticate)
 
 // authentication algorithm for websockets
 function authenticate(socket, data, callback) {
+    data = api.formatInput(data)
     api.isTokenValid(data.token, function(err, docs){
         if (err) return callback(new Error(err))
         else if(docs === null) return callback(new Error('Invalid token'))
