@@ -27,7 +27,7 @@ MongoClient.connect('mongodb://localhost:27017/waterknakkers', function(err, db)
   console.log('Database connected')
 
   server.listen(config.listenPort, function () {
-    console.log('secure web server is running at https://' + config.listenAddress + ':' + config.listenPort)
+    console.log('web server is running at http://' + config.listenAddress + ':' + config.listenPort)
   })
 })
 

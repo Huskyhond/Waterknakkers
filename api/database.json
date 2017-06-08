@@ -1,0 +1,2 @@
+{"_id":{"$oid":"5937d4793d2a25818339c019"},"username":"anna","password":"788c65a7902582af97a36267fceae874e7de28a3845c1f1c86ecbedea307bf43","token":"0a58c20def3052daa97055df4c62c07092cac1b0","isValid":1}
+{"_id":{"$oid":"5937f227a6b22b7fe35dc14e"},"username":"client","password":"2a97516c354b68848cdbd8f54a226a0a55b21ed138e207ad6c5cbb9c00aa5aea","token":"e953a2b2df155eead6bd4e8cf96a30345df2b729","isValid":1}
