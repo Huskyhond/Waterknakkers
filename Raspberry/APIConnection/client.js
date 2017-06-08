@@ -42,7 +42,7 @@ var options = {
     url: config.host + "/login",
     method: 'POST',
     headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-    form: { 'username': 'anna', 'password': 'waterknakker' }
+    form: { 'username': 'anna', 'password': 'waterknakkers' }
 }
 
 socket.on('connect', function () {
@@ -57,10 +57,6 @@ socket.on('connect', function () {
         console.log(err)
     })
 })
-
-
-
-
 
 socket.on('disconnect', function () {
     console.log('disconnected')
@@ -91,6 +87,7 @@ function requestToken(callback) {
     request(options, function (err, res, body) {
         if (!err && res.statusCode == 200) {
             var token = JSON.parse(body).token // response token is a string, so we parse it back to a JSON object
+            console.log('Received authentication token', token)
             callback(token)
         } else {
             callback(null)
