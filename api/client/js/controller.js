@@ -153,9 +153,9 @@ function updateStatus() {
 }
 
 function setMotionInHtml(motion) {
-    $('#motor_one').html(Math.round(motion.leftEngine*100)/100);
-    $('#motor_two').html(Math.round(motion.rightEngine*100)/100);
-    $('#rudder').html(Math.round(motion.rudder*100)/100);
+    $('#motor_one').html(motion.leftEngine);
+    $('#motor_two').html(motion.rightEngine);
+    $('#rudder').html(motion.rudder);
 }
 
 function scangamepads() {
