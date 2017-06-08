@@ -5,7 +5,7 @@ from pyparsing import*
 
 class Controller:
     def __init__(self, port='/dev/ttyACM0',baudrate=115200):
-        self.debug = True
+        self.debug = False
         try:
             self.ser=serial.Serial(port,baudrate)
             print('Serial port opened at:',port, 'baudrate:', baudrate)
@@ -32,11 +32,11 @@ class Controller:
             LR,RR,LM,RM
         """
         #constructs a string to send to the arduino
-        string = 'a'+str(int(self.rudderL))+'b'+str(int(self.rudderR))+'c'+str(int(self.motorL))+'d'+str(int(self.motorR))+'z'
+        writeValues = 'a'+str(int(self.rudderL))+'b'+str(int(self.rudderR))+'c'+str(int(self.motorL))+'d'+str(int(self.motorR))+'z'
         #send string to arduino
         if self.debug: 
-            print('write:',string)
-        self.ser.write(string)
+            print('write:',writeValues)
+        self.ser.write(str.encode(writeValues))
         #wait 10 ms
         sleep(0.01)
         #print the data that was send to the arduino
@@ -51,12 +51,15 @@ class Controller:
         test=Literal('a')+Word(nums)+Literal('b')+Word(nums)+Literal('c')+Word(nums)+Literal('d')+Word(nums)+Literal('z')
 
         try:
-            antwoord=test.parseString(echo)
+            if antwoord in test.parseString(echo):
+                pass
+            else:
+                #no data received from arduino, or incorrect format
+                if self.debug: 
+                    print('Incorrect or empty echo from arduino received')
+                    self.controllable = False
+                return 0
         except:
-            #no data received from arduino, or incorrect format
-            if self.debug: 
-                print('Incorrect or empty echo from arduino received')
-            self.controllable = False
             return 0
 
         results=[int(antwoord[1]),int(antwoord[3]),int(antwoord[5]),int(antwoord[7])]

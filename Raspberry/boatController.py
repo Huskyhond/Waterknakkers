@@ -4,13 +4,8 @@ import sys, json, math
 from time import sleep
 
 print('Running boat Controller')
+
 c = Controller()
-
-def recMotorData(motorOne, motorTwo):
-    c.Motor(motorOne, motorTwo)
-
-def recRudderData(rudder):
-    c.Rudder(rudder)
 
 def driveBoat(driveValues):
 	c.Motor(driveValues[0], driveValues[1])
@@ -48,6 +43,8 @@ while True:
 			# Stop following the quay wall
 			elif not followQuay and f.running:
 				f.stop()
+				c.Motor(0,0)
+				c.Rudder(0)
 			# Drive the boat using user controls
 			elif not followQuay and not f.running:
 				# Trying to write data to arduino.
@@ -60,5 +57,7 @@ while True:
 			# Stop the follow quay wall thread if boat is not controllable
 			if f.running:
 				f.stop()
+				
+				
 
 	sys.stdout.flush()
