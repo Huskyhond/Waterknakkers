@@ -22,6 +22,7 @@ app.use(express.static(__dirname + '/client'))
 //app.get('/location', endpoints.getBoatCoordinates)
 
 io.on('connection', function(socket) {
+    socket.sendBuffer = [];
     api.addConnection(socket)
     console.log('Socket connected!')
     
