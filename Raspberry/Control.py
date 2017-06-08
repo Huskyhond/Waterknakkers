@@ -62,8 +62,8 @@ class Controller:
                 self.controllable = False
                 return False
         except:
-            print('Error')
-            print(str.encode(writeValues), echo)
+            if self.debug:
+                print('Error comparing writeValues and echo.', 'writeValues:',str.encode(writeValues), 'echo:',echo)
             return False
 
         '''
