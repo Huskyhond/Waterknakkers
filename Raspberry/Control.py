@@ -5,7 +5,7 @@ from pyparsing import*
 
 class Controller:
     def __init__(self, port='/dev/ttyACM0',baudrate=115200):
-        self.debug = False
+        self.debug = True
         try:
             self.ser=serial.Serial(port,baudrate)
             print('Serial port opened at:',port, 'baudrate:', baudrate)
@@ -34,7 +34,8 @@ class Controller:
         #constructs a string to send to the arduino
         string = 'a'+str(int(self.rudderL))+'b'+str(int(self.rudderR))+'c'+str(int(self.motorL))+'d'+str(int(self.motorR))+'z'
         #send string to arduino
-        if debug: print('write:',string)
+        if self.debug: 
+            print('write:',string)
         self.ser.write(string)
         #wait 10 ms
         sleep(0.01)
@@ -42,7 +43,8 @@ class Controller:
         #print('Data naar arduino:', string)
         # read and print the echo from the arduino
         echo=self.ser.read(self.ser.inWaiting())
-        if debug: print('echo:',echo)
+        if self.debug: 
+            print('echo:',echo)
         #print('Data van arduino terug:',echo)
         # check is the echo is equal to the data send to the arduino
 
@@ -52,7 +54,8 @@ class Controller:
             antwoord=test.parseString(echo)
         except:
             #no data received from arduino, or incorrect format
-            if debug: print('Incorrect or empty echo from arduino received')
+            if self.debug: 
+                print('Incorrect or empty echo from arduino received')
             self.controllable = False
             return 0
 
@@ -67,7 +70,8 @@ class Controller:
             return 1
         else:
             #data received from arduino was of correct format, but not correct values
-            if debug: print('Incorrect echo from arduino received')
+            if self.debug: 
+                print('Incorrect echo from arduino received')
             return 0
 
     def check(self):
@@ -77,6 +81,9 @@ class Controller:
             self.controllable = True
 
     def Motor(self, motorL, motorR):
+        tmp = motorL
+        motorL = motorR
+        motorR = tmp
         motorL = motorL * 100
         motorR = motorR * 100
         motorL = np.clip(motorL,-100,100) / 2
@@ -88,6 +95,7 @@ class Controller:
 
 
     def Rudder(self, angle):
+        angle = angle * -1
         angle = angle * 100
         angle = np.clip(angle, -100, 100) / 2
         self.rudderL = self.rudderR = 90 + angle
