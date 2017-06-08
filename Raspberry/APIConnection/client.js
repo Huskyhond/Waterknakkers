@@ -5,7 +5,7 @@ var PythonShell = require('python-shell')
 //var gpspy = new PythonShell('../GPS/gps_callback.py')
 var controllerpy = new PythonShell('../boatController.py')
 
-var controllable
+var controllable, followQuay
 var queue = []
 
 var options = {
@@ -40,7 +40,6 @@ socket.on('connect', function () {
         console.log("Delay in ms:", delay, data.timestamp, now)
 
         var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
-        controllerpy.send(JSON.stringify(boatData))
         // Dont bother the arduino if the delay between the sockets is too much.
         if(delay > 200 && controllable) {
             controllerpy.send(JSON.stringify(boatData))	
@@ -72,6 +71,10 @@ controllerpy.on('message', function (message) {
     if(parse) {
         if(parse.controllable === true || parse.controllable === false) {
             controllable = parse.controllable
+        }
+        if(parse.followQuay === true || parse.followQuay === false) {
+            if(followQuay !== parse.followQuay) queue.append({ followQuay: parse.followQuay })
+            followQuay = parse.followQuay
         }
     }
 })
