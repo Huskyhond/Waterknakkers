@@ -73,7 +73,7 @@ class Api {
         var _this = this; // Socket this.
         collection.insert(data, function (err, result) {
             if (result.result.n == 1) {
-                _this.emit('info', data)
+                instance.io.sockets.emit('info', { id: _this.boatId, name: _this.name, info: data })
             }
         })
     }

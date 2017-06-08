@@ -118,3 +118,10 @@ time, mark, audio, video {
 .controller_radio {
     display: inline-block;
 }
+
+#console {
+    background-color: black;
+    color: white;
+    height: 400px;
+    overflow-y: scroll;
+}
