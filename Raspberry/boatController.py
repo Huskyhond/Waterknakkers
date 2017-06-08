@@ -19,6 +19,9 @@ def driveBoat(driveValues):
 followQuay = False
 f = Follow(driveBoat,60,45)
 
+print(json.dumps({'controllable': c.controllable, 'followQuay': f.running}))
+
+sys.stdout.flush()
 while True:
 	# Wait for input from NodeJS
 	userinput = sys.stdin.readline()
@@ -28,20 +31,14 @@ while True:
 
 	# If the length is more than 1, NodeJS Pushes an empty string time to time and also one character time to time.
 	if(len(userinput) > 1):
-		print('Got user input: ' + userinput + '(' + str(len(userinput)) + ')')
 		# Parse to python json object (list)
 		jsonObj = json.loads(userinput)
-
 		# Put values in correct variables
 		engineLeft = jsonObj[0]
 		engineRight = jsonObj[1]
 		rudder = jsonObj[2]
-		recMotorData(engineLeft, engineRight)
-		recRudderData(rudder)
-
-		# TODO:
-		# Alter followQuay boolean using userinput
-
+		#if jsonObj.length > 3:
+		#	followQuay = jsonObj[3]
 		# If controllable send data to arduino.
 		if c.controllable:
 			print('{ controllable: true }')
@@ -54,8 +51,8 @@ while True:
 			# Drive the boat using user controls
 			elif not followQuay and not f.running:
 				# Trying to write data to arduino.
-				recMotorData(engineLeft, engineRight)
-				recRudderData(rudder)
+				c.Motor(engineLeft, engineRight)
+				c.Rudder(rudder)
 		else:
 			print('{ controllable: false }')
 			# Checks if still uncontrollable.
