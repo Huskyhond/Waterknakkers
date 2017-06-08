@@ -19,6 +19,8 @@ def driveBoat(driveValues):
 followQuay = False
 f = Follow(driveBoat,60,45)
 
+print(json.dumps({'controllable': c.controllable, 'followQuay': f.running}))
+
 while True:
 	# Wait for input from NodeJS
 	userinput = sys.stdin.readline()
@@ -36,11 +38,10 @@ while True:
 		engineLeft = jsonObj[0]
 		engineRight = jsonObj[1]
 		rudder = jsonObj[2]
+		if jsonObj.length > 3:
+			followQuay = jsonObj[3]
 		recMotorData(engineLeft, engineRight)
 		recRudderData(rudder)
-
-		# TODO:
-		# Alter followQuay boolean using userinput
 
 		# If controllable send data to arduino.
 		if c.controllable:
