@@ -8,31 +8,13 @@ var controllerpy = new PythonShell('../boatController.py')
 var controllable
 var queue = []
 
-var options = {
-    url: config.host + "/login",
-    method: 'POST',
-    headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-    form: { 'username': 'anna', 'password': 'waterknakkers' }
-}
-
-
-socket.on('connect', function () {
-    requestToken(function (token) {
-        socket.emit('authentication', { token: token })
-        socket.on('authenticated', function () {
-            console.log('boat authenticated!')
-        })
-
-        socket.on('unautherized', function (err) {
-            console.log(err)
-        })
-    })
-
+var authenticatedOnly = function() {
+    console.log("Boat authenticated")
     socket.emit('boatreq', {
         id: config.id,
         name: config.name
     })
-    console.log('boats')
+
     socket.on('controller', function (data) {
         //console.log(data)
         var now = Date.now()
@@ -54,7 +36,32 @@ socket.on('connect', function () {
         }
     }, 100)
 
+}
+
+
+var options = {
+    url: config.host + "/login",
+    method: 'POST',
+    headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
+    form: { 'username': 'anna', 'password': 'waterknakker' }
+}
+
+socket.on('connect', function () {
+    requestToken(function (token) {
+        socket.emit('authentication', { token: token })
+    })
+    
+    socket.on('authenticated', authenticatedOnly)
+
+    socket.on('unautherized', function (err) {
+        console.log("unautherized")
+        console.log(err)
+    })
 })
+
+
+
+
 
 socket.on('disconnect', function () {
     console.log('disconnected')
