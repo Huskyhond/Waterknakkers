@@ -23,14 +23,18 @@ var authenticatedOnly = function() {
 
         var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
         // Dont bother the arduino if the delay between the sockets is too much.
-        if(delay > 200 && controllable) {
+	console.log('delay', delay, 'controllable', controllable)
+        //if(delay > 200 && controllable) {
             controllerpy.send(JSON.stringify(boatData))	
-        }
+        //}
+	//else {
+	//    controllerpy.send('')
+	//}
     })
 
     setInterval(function () {
         if (queue.length > 0) {
-            var data = queue.splice()
+            var data = queue.shift()
             socket.emit('info', data)
         }
     }, 100)
@@ -49,13 +53,13 @@ socket.on('connect', function () {
     requestToken(function (token) {
         socket.emit('authentication', { token: token })
     })
-    
-    socket.on('authenticated', authenticatedOnly)
+})
 
-    socket.on('unautherized', function (err) {
-        console.log("unautherized")
-        console.log(err)
-    })
+socket.on('authenticated', authenticatedOnly)
+
+socket.on('unautherized', function (err) {
+	console.log("unautherized")
+	console.log(err)
 })
 
 socket.on('disconnect', function () {
@@ -74,9 +78,10 @@ controllerpy.on('message', function (message) {
     if(parse) {
         if(parse.controllable === true || parse.controllable === false) {
             controllable = parse.controllable
+	    console.log('setting controllable to', controllable)
         }
         if(parse.followQuay === true || parse.followQuay === false) {
-            if(followQuay !== parse.followQuay) queue.append({ followQuay: parse.followQuay })
+            if(followQuay !== parse.followQuay) queue.push({ followQuay: parse.followQuay })
             followQuay = parse.followQuay
         }
     }
@@ -97,7 +102,7 @@ function requestToken(callback) {
 /*
 gpspy.on('message', function (message) {
   // On rec of a coordinate.
-  queue.append({ sensors: {}, location: message })
+  queue.push({ sensors: {}, location: message })
 })
 
 gpspy.end(function (err) {

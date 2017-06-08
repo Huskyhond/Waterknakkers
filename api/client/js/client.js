@@ -4,45 +4,49 @@ var socket = io();
 
 
 socket.on('connect', function(){
-    socket.emit('authentication', {token : 'e953a2b2df155eead6bd4e8cf96a30345df2b729'});
-    socket.on('authenticated', function (){
-        console.log('client authenticated!')
-    })
-
-    socket.on('unauthorized', function (err) {
-        console.log(err)
-    })
-    
     socket.emit('getBoats');
-    
-    socket.on('getBoats', function(boatsin) {
-        console.log(boats);
-        console.log(boatsin);
-        for(var i in boatsin.boats) {
-            boats.push(boatsin.boats[i]);
-        }
-        updateBoats();
-    });
-    
-    socket.on('boatConnected', function(boat) {
-        boats.push(boat.boat);
-        updateBoats();
-    });
-    
-    socket.on('boatDisconnected', function(boat) {
-        var boat = boat.boat;
-        for(var i in boats) {
-            var _boat = boats[i];
-            if(_boat.id == boat.id) {
-                boats.splice(i, 1);
-            }
-        }
-        updateBoats();
-    });
-
 });
 
+socket.emit('authentication', {token : 'e953a2b2df155eead6bd4e8cf96a30345df2b729'});
 
+socket.on('authenticated', function (){
+    console.log('client authenticated!')
+})
+
+socket.on('unauthorized', function (err) {
+    console.log(err)
+})
+
+socket.on('info', function(data) {
+    if(data.id == boatSelected) {
+        $('#console').append('<div>' + JSON.stringify(data.info) + '</div>');
+    }
+})
+
+socket.on('getBoats', function(boatsin) {
+    console.log(boats);
+    console.log(boatsin);
+    for(var i in boatsin.boats) {
+        boats.push(boatsin.boats[i]);
+    }
+    updateBoats();
+});
+
+socket.on('boatConnected', function(boat) {
+    boats.push(boat.boat);
+    updateBoats();
+});
+
+socket.on('boatDisconnected', function(boat) {
+    var boat = boat.boat;
+    for(var i in boats) {
+        var _boat = boats[i];
+        if(_boat.id == boat.id) {
+            boats.splice(i, 1);
+        }
+    }
+    updateBoats();
+});
 
 $(document).ready(function() {
     $('input[type=radio][name=controller]').change(function() {
