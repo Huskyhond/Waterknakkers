@@ -1,7 +1,7 @@
 var fs = require('fs')
 
 var address = '127.0.0.1'
-var port = '8443'
+var port = '80'
 var privateKey = fs.readFileSync('cert/key.pem', 'utf8')
 var certificate = fs.readFileSync('cert/cert.pem', 'utf8')
 

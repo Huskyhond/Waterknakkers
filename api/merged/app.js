@@ -1,12 +1,11 @@
 /* REQUIRES */
 var config = require('./config.js')
-var endpoint = require('./endpoint')
 var endpoints = require('./endpoints')
-var db = require('./database.js')
 
 var bodyParser = require('body-parser')
-var app = require('express')()
-var server = require('https').createServer(config.httpsCredentials, app)
+var express = require('express')
+var app = express()
+var server = require('http').createServer(app)
 var io = require('socket.io').listen(server)
 var api = require('./api')(io)
 var MongoClient = require('mongodb').MongoClient
@@ -32,22 +31,33 @@ MongoClient.connect('mongodb://localhost:27017/waterknakkers', function(err, db)
   })
 })
 
-app.use(exres.static(__dirname + '../client'))
-
+app.use(express.static(__dirname + '/client'))
+app.post('/login', api.authenticate)
 
 // authentication algorithm for websockets
 function authenticate(socket, data, callback) {
-    db.isTokenValid(data.token, function (err, rows, fields) {
+    api.isTokenValid(data.token, function(err, docs){
         if (err) return callback(new Error(err))
-        else if(!rows[0].isValid) return callback(new Error('Invalid token'))
+        else if(docs === null) return callback(new Error('Invalid token'))
         else return callback(null, true)
     })
 }
 
 function postAuthenticate(socket, data) {
-    socket.on('test', function (data) {
-        console.log(data)
-    })
+    if(socket.auth){
+        api.addConnection(socket)
+        console.log('Socket connected!')
+
+        socket.on('controller', api.onMotion)
+
+        socket.on('boatreq', api.joinBoat)
+
+        socket.on('getBoats', api.getBoats)
+
+        socket.on('disconnect', api.disconnect)
+
+        socket.on('info', api.parseInformation)
+    }
 }
 
 function disconnect(socket) {

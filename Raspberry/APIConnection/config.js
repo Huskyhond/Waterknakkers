@@ -1,5 +1,5 @@
 module.exports = {
-    host: 'https://waterknakkers.niekeichner.nl',
+    host: 'http://127.0.0.1',
     id: "das09sad90ds90",
-    name: 'De henk boot'
+    name: 'STEFAN_PC'
 }

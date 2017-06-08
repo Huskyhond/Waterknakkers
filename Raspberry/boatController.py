@@ -21,5 +21,4 @@ while True:
 		rudder = jsonObj[2]
 		recMotorData(engineLeft, engineRight)
 		recRudderData(rudder)
-        userinput =None 
 	sys.stdout.flush()
