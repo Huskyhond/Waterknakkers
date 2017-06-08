@@ -14,7 +14,7 @@ require('socketio-auth')(io, {
     authenticate: authenticate, // auth function
     postAuthenticate: postAuthenticate, // post auth function, what to do when connection is allowed
     disconnect: disconnect, // disconnect function
-    timeout: 1000 // timeout in ms
+    timeout: 10000 // timeout in ms
 })
 /* REQUIRES */
 app.use(bodyParser.json()) // support JSON-encoded post bodies
@@ -36,6 +36,7 @@ app.post('/login', api.authenticate)
 
 // authentication algorithm for websockets
 function authenticate(socket, data, callback) {
+    data = api.formatInput(data)
     api.isTokenValid(data.token, function(err, docs){
         if (err) return callback(new Error(err))
         else if(docs === null) return callback(new Error('Invalid token'))

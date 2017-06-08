@@ -26,6 +26,7 @@ class Api {
     }
 
     onMotion(data) {
+        data = instance.formatInput(data)
         console.log('Sending data to boat: ' + data.boat)
         var socket = instance.getConnection(data.boat)
         if (socket) {
@@ -34,6 +35,7 @@ class Api {
     }
 
     joinBoat(options) {
+        options = instance.formatInput(options)
         console.log("Boat connected")
         this.name = options.name
         this.boatId = options.id
@@ -64,9 +66,10 @@ class Api {
     }
 
     parseInformation(data) {
-        if (typeof (data) !== 'object')
+        data = instance.formatInput(data)
+        if (typeof (data) !== 'object' || Array.isArray(data))
             return
-        var collection = this.db.collection('boatData')
+        var collection = instance.db.collection('boatData')
         var _this = this; // Socket this.
         collection.insert(data, function (err, result) {
             if (result.result.n == 1) {
@@ -107,6 +110,18 @@ class Api {
     isTokenValid(token, callback) {
         var collection = instance.db.collection('users')
         collection.findOne({ token: token, isValid: 1 }, callback)
+    }
+
+    formatInput(input){
+        if(typeof(input) === 'object') return input
+        var output = {}
+        try {
+            output = JSON.parse(input)
+        }    
+        catch(e){
+            // No object.
+        }
+        return output
     }
 
 }

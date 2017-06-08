@@ -26,17 +26,22 @@ Als client dien je een wrapper te hebben voor Socket.IO veel programmeertalen he
 
 Connect eerst met de server we gebruiken in het voorbeeld NodeJs:
 
-'''javascript
+```javascript
 var socket = io();
-'''
+```
 
 Je kan in de io als eerste parameter ook een ip en poort opgeven als de client niet dezelfde host heeft. Nadat je geauthentiseerd bent met de server kan je aan de slag.
 
 **Emit**
 *	getBoats – Vraag een boot emit aan de server, ontvang deze met on(‘getBoats’)
 
-On
+**On**
 *	boatConnected – Als er een nieuwe boot is geconnect tijdens je sessie.
 *	boatDisconnected – Als er een boot geen internet meer heeft.
 *	getBoats – Ontvang alle verbonden boten van de server. (eerst emitten)
 *	controller – Ontvang de motor en rudder informatie (Je kan deze alleen ontvangen als je je als boot geauthentiseerd hebt.
+* 
+
+**Authenticatie**
+*   Stuur een HTTP x-www-form-urlencoded POST request naar /login van de host. Key values van dit POST request zijn 'username' en 'password'
+*   
