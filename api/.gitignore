@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 node_modules
 cert
-=======
 node_modules/*
 config.js
 secured/config.js
->>>>>>> e535343e6281d984967933a7dcff9df78f8e7aef

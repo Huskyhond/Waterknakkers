@@ -36,10 +36,8 @@ while True:
 		engineLeft = jsonObj[0]
 		engineRight = jsonObj[1]
 		rudder = jsonObj[2]
-<<<<<<< HEAD
 		recMotorData(engineLeft, engineRight)
 		recRudderData(rudder)
-=======
 
 		# TODO:
 		# Alter followQuay boolean using userinput
