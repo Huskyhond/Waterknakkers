@@ -67,9 +67,9 @@ class Api {
 
     parseInformation(data) {
         data = instance.formatInput(data)
-        if (typeof (data) !== 'object')
+        if (typeof (data) !== 'object' || Array.isArray(data))
             return
-        var collection = this.db.collection('boatData')
+        var collection = instance.db.collection('boatData')
         var _this = this; // Socket this.
         collection.insert(data, function (err, result) {
             if (result.result.n == 1) {

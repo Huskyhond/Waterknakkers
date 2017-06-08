@@ -14,7 +14,7 @@ require('socketio-auth')(io, {
     authenticate: authenticate, // auth function
     postAuthenticate: postAuthenticate, // post auth function, what to do when connection is allowed
     disconnect: disconnect, // disconnect function
-    timeout: 1000 // timeout in ms
+    timeout: 10000 // timeout in ms
 })
 /* REQUIRES */
 app.use(bodyParser.json()) // support JSON-encoded post bodies
