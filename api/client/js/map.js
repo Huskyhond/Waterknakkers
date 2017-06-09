@@ -1,31 +1,17 @@
-function readFile(map) {
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            var arr = xmlhttp.responseText.match(/[^\r\n]+/g);
-            for(var i = 0; i < arr.length; i++) {
-                var splitted = arr[i].split(',');
-                var isDuplicate = false;
-                for(var j = 0; j < markers.length; j++) {
-                    var marker = markers[j];
-                    if(marker[0] == splitted[0] && marker[1] == splitted[1]) {
-                        isDuplicate = true;
-                    }
-                }
-                if(!isDuplicate) {
-                    if(i < arr.length-2)
-                        L.circle(splitted, 1).addTo(map);
-                    else
-                        L.marker(splitted).addTo(map);
-                    markers.push(splitted);
-                }
-            }
-        }
-    }
-
-    xmlhttp.open("GET", "coords.txt", true);
-    xmlhttp.send();
+var markers = [];
+function addToMap(latLngArr) {
+	console.log('Adding marker', latLngArr)
+	if(markers.length > 0) {
+		var oldMarker = markers.pop();
+		var oldLatLng = oldMarker._latlng;
+		map.removeLayer(oldMarker);
+		markers.push(L.circle(latLngArr, 0.1).addTo(map));
+	}
+	else {
+		map.setView(new L.LatLng(latLngArr[0], latLngArr[1]), 16);
+	}
+	markers.push(L.marker(latLngArr).addTo(map));
 }
-
 L.mapbox.accessToken = 'pk.eyJ1IjoiaHVza3lob25kIiwiYSI6ImNqMmFibjd3cDAwMDkzM21laXBncDN0bGgifQ.bBUvToPnn5_wAP12kmwJyw';
 var markers = [];
 var map = L.mapbox.map('map', 'mapbox.light')
@@ -37,7 +23,3 @@ setInterval(function() {
     //readFile(map);
 }, 1000);
 
-
-var marker = new mapboxgl.Marker()
-    .setLngLat([30.5, 50.5])
-    .addTo(map);

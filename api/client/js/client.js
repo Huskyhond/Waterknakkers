@@ -4,13 +4,13 @@ var socket = io();
 
 
 socket.on('connect', function(){
-    socket.emit('getBoats');
 });
 
 socket.emit('authentication', {token : 'e953a2b2df155eead6bd4e8cf96a30345df2b729'});
 
 socket.on('authenticated', function (){
     console.log('client authenticated!')
+    socket.emit('getBoats');
 })
 
 socket.on('unauthorized', function (err) {
@@ -20,6 +20,9 @@ socket.on('unauthorized', function (err) {
 socket.on('info', function(data) {
     if(data.id == boatSelected) {
         $('#console').append('<div>' + JSON.stringify(data.info) + '</div>');
+	if(data.info && data.info.location) {
+		addToMap(data.info.location)
+	}
     }
 })
 
