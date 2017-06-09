@@ -30,7 +30,8 @@ class Api {
         console.log('Sending data to boat: ' + data.boat)
         var socket = instance.getConnection(data.boat)
         if (socket) {
-            socket.emit('controller', { timestamp: Date.now(), motion: data.motion })
+	    data.timestamp =  Date.now()
+            socket.emit('controller', data)
         }
     }
 
@@ -102,7 +103,8 @@ class Api {
                     }))
                 res.end()
             } else {
-                if (err) errorReceived(res, 1, err) // send the error in a json response if occured
+                if (err) errorReceived(res, err) // send the error in a json response if occured
+                errorReceived(res, 'Invalid username or password')
             }
         })
     }
@@ -112,14 +114,14 @@ class Api {
         collection.findOne({ token: token, isValid: 1 }, callback)
     }
 
-    formatInput(input){
+    formatInput(input){ // format JSON string to JSON objects
         if(typeof(input) === 'object') return input
         var output = {}
         try {
             output = JSON.parse(input)
         }    
         catch(e){
-            // No object.
+            // No object. Ignore
         }
         return output
     }
@@ -132,11 +134,10 @@ var generateToken = function () {
 }
 
 // return any error that occured to the user as a JSON response
-var errorReceived = function (res, errnum, err) {
+var errorReceived = function (res, err) {
     res.setHeader('Content-Type', 'application/json')
     res.write(
         JSON.stringify({
-            'code': errnum,
             'error': err
         }));
     res.end();

@@ -6,9 +6,27 @@ var gpspy = new PythonShell('../GPS/get_gps.py')
 var controllerpy = new PythonShell('../boatController.py')
 
 var controllable, followQuay
+var coords = [51.897184, 4.4178663] // hard coded -> RDM's location
 var queue = []
+var tokenRequestOptions = {
+    url: config.host + "/login",
+    method: 'POST',
+    headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
+    form: { 'username': 'anna', 'password': 'waterknakker' }
+}
 
-var authenticatedOnly = function() {
+var temperatureRequestOptions = {
+    url: 'http://api.openweathermap.org/data/2.5/weather',
+    method: 'GET',
+    //headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
+    qs: { 'lat': coords[0], 'lon': coords[1], 'units': 'metric', 'APPID': '9977c05ce186bfe3c57ee3dbba5ef581' }
+}
+
+httpRequest(temperatureRequestOptions, function (data) {
+    console.log('Current temperature in ' + data.name + ' is ' + data.main.temp + ' °C')
+})
+
+var authenticatedOnly = function () {
     console.log("Boat authenticated")
     socket.emit('boatreq', {
         id: config.id,
@@ -23,13 +41,13 @@ var authenticatedOnly = function() {
 
         var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
         // Dont bother the arduino if the delay between the sockets is too much.
-	console.log('delay', delay, 'controllable', controllable)
+        console.log('delay', delay, 'controllable', controllable)
         //if(delay > 200 && controllable) {
-            controllerpy.send(JSON.stringify(boatData))	
+        controllerpy.send(JSON.stringify(boatData))
         //}
-	//else {
-	//    controllerpy.send('')
-	//}
+        //else {
+        //    controllerpy.send('')
+        //}
     })
 
     setInterval(function () {
@@ -49,16 +67,17 @@ var options = {
 }
 
 socket.on('connect', function () {
-    requestToken(function (token) {
-        socket.emit('authentication', { token: token })
+    httpRequest(tokenRequestOptions, function (data) {
+        console.log('Recieved auth token', data.token)
+        socket.emit('authentication', { token: data.token })
     })
 })
 
 socket.on('authenticated', authenticatedOnly)
 
 socket.on('unautherized', function (err) {
-	console.log("unautherized")
-	console.log(err)
+    console.log("unautherized")
+    console.log(err)
 })
 
 socket.on('disconnect', function () {
@@ -71,28 +90,28 @@ controllerpy.on('message', function (message) {
     try {
         parse = JSON.parse(message);
     }
-    catch(e) {
+    catch (e) {
         // Not a json object, ignore..
     }
-    if(parse) {
-        if(parse.controllable === true || parse.controllable === false) {
+    if (parse) {
+        if (parse.controllable === true || parse.controllable === false) {
             controllable = parse.controllable
-	    console.log('setting controllable to', controllable)
+            console.log('setting controllable to', controllable)
         }
-        if(parse.followQuay === true || parse.followQuay === false) {
-            if(followQuay !== parse.followQuay) queue.push({ followQuay: parse.followQuay })
+        if (parse.followQuay === true || parse.followQuay === false) {
+            if (followQuay !== parse.followQuay) queue.push({ followQuay: parse.followQuay })
             followQuay = parse.followQuay
         }
     }
 })
 
 
-function requestToken(callback) {
+function httpRequest(options, callback) {
     request(options, function (err, res, body) {
         if (!err && res.statusCode == 200) {
-            var token = JSON.parse(body).token // response token is a string, so we parse it back to a JSON object
-            console.log('Received authentication token', token)
-            callback(token)
+            var paredBody = JSON.parse(body) // response is a string, so we parse it back to a JSON object
+            console.log('Recieved http response')
+            callback(paredBody)
         } else {
             callback(null)
         }
