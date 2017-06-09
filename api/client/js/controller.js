@@ -2,6 +2,7 @@ var haveEvents = 'GamepadEvent' in window;
 var haveWebkitEvents = 'WebKitGamepadEvent' in window;
 var controllers = {};
 var oldMotion = { leftEngine: 0, rightEngine: 0, rudder: 0 };
+var followQuay = null;
 var xbone = {
     leftTrigger: 0,
     rightTrigger: 0,
@@ -145,7 +146,8 @@ function updateStatus() {
         var motion = controllerConfig.calculateMotion(xboneController);
         setMotionInHtml(motion);
         if(motion.leftEngine != oldMotion.leftEngine || motion.rightEngine != oldMotion.rightEngine || motion.rudder != oldMotion.rudder) {
-            socket.emit('controller', {boat: boatSelected, motion: motion});
+	    var toEmit = {boat: boatSelected, motion: motion };
+            socket.emit('controller', toEmit);
         }
         oldMotion = motion;
     }

@@ -30,7 +30,8 @@ class Api {
         console.log('Sending data to boat: ' + data.boat)
         var socket = instance.getConnection(data.boat)
         if (socket) {
-            socket.emit('controller', { timestamp: Date.now(), motion: data.motion })
+	    data.timestamp =  Date.now()
+            socket.emit('controller', data)
         }
     }
 

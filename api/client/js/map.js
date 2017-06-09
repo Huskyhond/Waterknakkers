@@ -34,7 +34,7 @@ var map = L.mapbox.map('map', 'mapbox.light')
 var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 
 setInterval(function() {
-    readFile(map);
+    //readFile(map);
 }, 1000);
 
 
