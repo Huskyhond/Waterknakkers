@@ -2,7 +2,7 @@ var config = require('./config')
 var request = require('request')
 var socket = require('socket.io-client')(config.host)
 var PythonShell = require('python-shell')
-//var gpspy = new PythonShell('../GPS/gps_callback.py')
+var gpspy = new PythonShell('../GPS/get_gps.py')
 var controllerpy = new PythonShell('../boatController.py')
 
 var controllable, followQuay
@@ -40,7 +40,6 @@ var authenticatedOnly = function() {
     }, 100)
 
 }
-
 
 var options = {
     url: config.host + "/login",
@@ -99,14 +98,24 @@ function requestToken(callback) {
         }
     })
 }
-/*
+var gpsIterations = 0
+var latT = 0, lngT = 0
+setInterval(function() {
+  gpspy.send()
+}, 1000/10)
+
 gpspy.on('message', function (message) {
+  var msgParsed = JSON.parse(message)
+  gpsIterations++
+  latT += msgParsed[0]
+  lngT += msgParsed[1]
   // On rec of a coordinate.
-  queue.push({ sensors: {}, location: message })
+  if(gpsIterations > 9) { // Send location every second (location is average of 10 calls)
+    var lat = latT/gpsIterations
+    var lng = lngT/gpsIterations
+    queue.push({ sensors: {}, location: [lat,lng] })
+    latT = lngT = gpsIterations = 0
+  }
 })
 
-gpspy.end(function (err) {
-  //if (err) throw err
-  //console.log(err)
-})
-*/
+gpspy.on('end', function(err) { console.log('ERROR OF GPS', err) })
