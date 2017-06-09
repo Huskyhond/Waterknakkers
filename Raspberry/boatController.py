@@ -4,15 +4,10 @@ import sys, json, math
 from time import sleep
 
 print('Running boat Controller')
-
 c = Controller()
 
-def driveBoat(driveValues):
-	c.Motor(driveValues[0], driveValues[1])
-	c.Rudder(driveValues[2])
-
 followQuay = False
-f = Follow(driveBoat,60,45)
+f = Follow(c.driveBoat,60,45)
 
 print(json.dumps({'controllable': c.controllable, 'followQuay': f.running}))
 
@@ -36,27 +31,24 @@ while True:
 		#	followQuay = jsonObj[3]
 		# If controllable send data to arduino.
 		if c.controllable:
-			print('{ controllable: true }')
 			# Start following the quay wall
 			if followQuay and not f.running:
 				f.start()
 			# Stop following the quay wall
 			elif not followQuay and f.running:
 				f.stop()
-				c.Motor(0,0)
-				c.Rudder(0)
+				c.driveBoat(0,0,0)
 			# Drive the boat using user controls
 			elif not followQuay and not f.running:
 				# Trying to write data to arduino.
-				c.Motor(engineLeft, engineRight)
-				c.Rudder(rudder)
+				c.driveBoat(engineLeft,engineRight,rudder)
 		else:
-			print('{ controllable: false }')
 			# Checks if still uncontrollable.
 			c.check()
 			# Stop the follow quay wall thread if boat is not controllable
 			if f.running:
 				f.stop()
+		print(json.dumps({'controllable':c.controllable}))
 				
 				
 
