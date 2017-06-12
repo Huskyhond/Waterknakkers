@@ -52,6 +52,7 @@ class Coords():
         if(calcDeltaBoatAngle() > 0):
             # Turn clockwise
             motorL = motorR = self.max_power
+            # memes
         elif(calcDeltaBoatAngle() < 0):
             # Turn counter clockwise
             
