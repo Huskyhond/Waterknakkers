@@ -48,7 +48,7 @@ Je kan in de io als eerste parameter ook een ip en poort opgeven als de client n
 
 De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappen die onderverdeeld zijn in functies. Hier volgt per functie een uitleg wat hij doet.
 
-*   ```api.login``` - Deze functie neemt ```username``` en ```password``` als parameter. Deze parameters behoren in een HTTP POST request gestuurd te worden naar ```<hostname>/login```. 
+*   ```api.login``` - Deze functie neemt ```username``` en ```password``` als parameter. Deze parameters behoren in een HTTP POST request gestuurd te worden naar ```<hostname / ip-address>/login```. Deze hostname / ip-address dient te worden geconfigureerd in ```config.js``` 
 
     Als de opgegeven username en password correct is krijg je een response met een ```token``` die gebruikt kan worden om je te authoriseren met de WebSocket.  De request dient ```x-www-form-urlencoded``` te zijn. 
 
@@ -68,6 +68,8 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
     })
     ```
     Als de token foutief of niet geldig blijkt te zijn zal de server een ```unautherized``` event sturen. Hierna zal de connectie direct worden beeindigt.
-    
+
     Als de token geldig is zal de server een ```autherized``` event sturen en word de verbinding toegestaan en kunnen de api functies worden aangeroepen.
+
+*   ```postAuthenticate``` - 
 
