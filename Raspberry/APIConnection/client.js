@@ -126,7 +126,8 @@ gpspy.on('message', function (message) {
         var lat = latT / gpsIterations
         var lng = lngT / gpsIterations
 
-        if (initialize) { // get the innitial location of the boat to determine outside temperature
+
+        if (initialize && lng > 0) { // get the innitial location of the boat to determine outside temperature
             temperatureRequestOptions.qs.lat = lat
             temperatureRequestOptions.qs.lon = lng
 
