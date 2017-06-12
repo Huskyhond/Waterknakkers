@@ -20,9 +20,11 @@ socket.on('unauthorized', function (err) {
 socket.on('info', function(data) {
     if(data.id == boatSelected) {
         $('#console').append('<div>' + JSON.stringify(data.info) + '</div>');
-	if(data.info && data.info.location) {
-		addToMap(data.info.location)
-	}
+    }
+    
+    if(data.info && data.info.location) {
+        addToMap(data.info.location)
+        setStartPosition(data.info.location, getBoatById(data.id).name)
     }
 })
 
@@ -69,6 +71,14 @@ $(document).ready(function() {
     });
 
 });
+
+function getBoatById(id) {
+    for(var i in boats) {
+        if(boats[i].id == id)
+            return boats[i];
+    }
+    return false;
+}
 
 function updateBoats() {
     var parent = $("#boatRadios");

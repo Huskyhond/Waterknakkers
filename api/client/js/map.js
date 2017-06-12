@@ -1,4 +1,5 @@
 var markers = [];
+var navigationPath = [];
 function addToMap(latLngArr) {
 	console.log('Adding marker', latLngArr)
 	if(markers.length > 0) {
@@ -14,12 +15,34 @@ function addToMap(latLngArr) {
 }
 L.mapbox.accessToken = 'pk.eyJ1IjoiaHVza3lob25kIiwiYSI6ImNqMmFibjd3cDAwMDkzM21laXBncDN0bGgifQ.bBUvToPnn5_wAP12kmwJyw';
 var markers = [];
-var map = L.mapbox.map('map', 'mapbox.light')
+var map = L.mapbox.map('map', 'mapbox.streets')
     .setView([51.8980995, 4.4171458], 16);
 
-var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+function setStartPosition(marker, boatName) {
+	var latlng = Array.isArray(marker) ? marker : marker.latlng;
+	if(navigationPath[0]) map.removeLayer(navigationPath[0]);
+	var newMarker = new L.marker(latlng).bindPopup('<h4>' + boatName + '</h4>').addTo(map).openPopup();
+	navigationPath[0] = newMarker;
+};
 
-setInterval(function() {
-    //readFile(map);
-}, 1000);
+var addMarker = function(event) {
+	// If it is already navigating to a different marker, remove that one first.
+	if(navigationPath.length < 1) {
+    	setStartPosition(event);
+	}
+	else {
+		if(navigationPath.length > 1) {
+			var lastMarker = navigationPath.pop();
 
+			var latLng = lastMarker._latlng;
+			map.removeLayer(lastMarker);
+			navigationPath.push(L.circle(latLng, 0,1).addTo(map));
+		}
+		var newMarker = new L.marker(event.latlng).bindPopup('<h4>End</h4>').addTo(map).openPopup();
+		navigationPath.push(newMarker);
+	}
+	var navCoords = navigationPath.map(function(marker) { return [marker._latlng.lat, marker._latlng.lng] });
+	L.polyline(navCoords, { color: 'red'}).addTo(map);
+};
+
+map.on('click', addMarker);
