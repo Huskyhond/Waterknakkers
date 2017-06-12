@@ -6,14 +6,14 @@ var gpspy = new PythonShell('../GPS/get_gps.py')
 var controllerpy = new PythonShell('../boatController.py')
 
 var controllable, followQuay
-var coords = [] // hard coded -> RDM's location
+var coords = []
 var queue = []
 var initialize = true
 var tokenRequestOptions = {
     url: config.host + "/login",
     method: 'POST',
     headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-    form: { 'username': 'anna', 'password': 'waterknakker' }
+    form: { 'username': config.username, 'password': config.password }
 }
 
 var temperatureRequestOptions = {
