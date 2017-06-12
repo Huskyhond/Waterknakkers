@@ -138,9 +138,13 @@ gpspy.on('message', function (message) {
                 controllerpy.send(JSON.stringify([temperature]))
             })
 
-
         }
-        queue.push({ sensors: {}, location: [lat, lng] })
+        
+        // Only push info is the GPS data is good.
+        if(lng > 0) {
+            queue.push({ sensors: {}, location: [lat, lng] })
+        }
+        
         latT = lngT = gpsIterations = 0
     }
 })
