@@ -12,7 +12,7 @@ from time import time
 import os
 
 class IMU:
-    def __init__(self, speed, debug = False):
+    def __init__(self, debug = False):
         self.HOST = "localhost"
         self.PORT = 4223
         self.UID = "62Bous"
@@ -27,7 +27,6 @@ class IMU:
         self.i = 0
         # Velocity
         self.cvelocity = 0
-        self.speed = speed
 
     # Callback function for all data callback including linear_acceleration
     def cb_all_data(self, acceleration, magnetic_field, angular_velocity,
@@ -76,7 +75,7 @@ class IMU:
         currentdt += dt
         i += 1
 
-    def cb_speed(self):
+    def connect(self):
         # Create IP Connection required for the IMU to connect.
         ipcon = IPConnection()
         # Create an object to use the required functions
@@ -84,12 +83,11 @@ class IMU:
         # Connect the IP connection to the IMU brick
         ipcon.connect(self.HOST, self.PORT)
         # Create callback that returns the acceleration of the IMU Brick
-        imu.register_callback(imu.CALLBACK_ALL_DATA, cb_all_data(self.speed))
+        # imu.register_callback(imu.CALLBACK_ALL_DATA, cb_all_data(self.speed))
         # Refresh the timer of the Callback to REFRESH_TIME
-        imu.set_all_data_period(self.REFRESH_TIME)
-        input("Press key to exit\n")
-        ipcon.disconnect()
+        # imu.set_all_data_period(self.REFRESH_TIME)
+        # input("Press key to exit\n")
+        # ipcon.disconnect()
 
-# Debugging
-n = IMU(10)
-n.cb_speed()
+    def disconnect(self):
+        ipcon.disconnect()
