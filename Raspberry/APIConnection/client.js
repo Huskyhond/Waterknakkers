@@ -20,7 +20,7 @@ var temperatureRequestOptions = {
     url: 'http://api.openweathermap.org/data/2.5/weather',
     method: 'GET',
     //headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-    qs: { 'lat': coords[0], 'lon': coords[1], 'units': 'metric', 'APPID': '9977c05ce186bfe3c57ee3dbba5ef581' }
+    qs: { 'lat': 0, 'lon': 1, 'units': 'metric', 'APPID': '9977c05ce186bfe3c57ee3dbba5ef581' }
 }
 
 var authenticatedOnly = function () {
@@ -125,8 +125,10 @@ gpspy.on('message', function (message) {
         var lng = lngT / gpsIterations
 
         if (initialize) {
-            coords = [lat, lng]
+            temperatureRequestOptions.qs.lat = lat
+            temperatureRequestOptions.qs.lon = lng
             httpRequest(temperatureRequestOptions, function (data) {
+                console.log(data)
                 initialize = false
                 console.log('Current temperature in ' + data.name + ' is ' + data.main.temp + ' °C')
             })
