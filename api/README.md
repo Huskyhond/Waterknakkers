@@ -33,16 +33,16 @@ var socket = io();
 Je kan in de io als eerste parameter ook een ip en poort opgeven als de client niet dezelfde host heeft. Nadat je geauthentiseerd bent met de server kan je aan de slag.
 
 **Emit**
-*   authentication - Geef een valide authenticatie token als payload van de functie.
-*	getBoats – Vraag een boot emit aan de server, ontvang deze met on(‘getBoats’)
+*   ```authentication``` - Geef een valide authenticatie token als payload van de functie.
+*	```getBoats``` – Vraag een boot emit aan de server, ontvang deze met on(‘getBoats’)
 
 **On**
-*   authenticated - Response op emit 'authentication' als deze geslaagt is.
-*   unautherized - Reponse op emit 'authenticatino als deze mislukt is, hierna word de socket meteen gesloten.
-*	boatConnected – Als er een nieuwe boot is geconnect tijdens je sessie.
-*	boatDisconnected – Als er een boot geen internet meer heeft.
-*	getBoats – Ontvang alle verbonden boten van de server. (eerst emitten)
-*	controller – Ontvang de motor en rudder informatie (Je kan deze alleen ontvangen als je je als boot geauthentiseerd hebt.
+*   ```authenticated``` - Response op emit 'authentication' als deze geslaagt is.
+*   ```unautherized``` - Reponse op emit 'authenticatino als deze mislukt is, hierna word de socket meteen gesloten.
+*	```boatConnected``` – Als er een nieuwe boot is geconnect tijdens je sessie.
+*	```boatDisconnected``` – Als er een boot geen internet meer heeft.
+*	```getBoats``` – Ontvang alle verbonden boten van de server. (eerst emitten)
+*	```controller``` – Ontvang de motor en rudder informatie (Je kan deze alleen ontvangen als je je als boot geauthentiseerd hebt.
 
 **Authenticatie**
 
@@ -52,8 +52,22 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
 
     Als de opgegeven username en password correct is krijg je een response met een ```token``` die gebruikt kan worden om je te authoriseren met de WebSocket.  De request dient ```x-www-form-urlencoded``` te zijn. 
 
+    succesvol voorbeeld  HTTP reponse
     ```JS
     { token: 'examplereponsetoken'}
     ```
+    onsuccesvol voorbeeld HTTP response
+    ```JS
+    { error: 'error msg'}
+    ```
+*   ```authenticate``` - Deze functie neemt als parameter een token verkregen uit functie hierboven. Deze token moet meegestuurt worden zodra de gebruiker een connectie maakt met de WebSocket. Hieronder is een voorbeeld te zien in JavaScript.
 
-*   ```authenticate``` - Deze functie neemt als parameter een token verkregen uit functie hierboven.
+    ```JS
+    socket.on('connect', function(){
+        socket.emit('authentication', token)
+    })
+    ```
+    Als de token foutief of niet geldig blijkt te zijn zal de server een ```unautherized``` event sturen. Hierna zal de connectie direct worden beeindigt.
+    
+    Als de token geldig is zal de server een ```autherized``` event sturen en word de verbinding toegestaan en kunnen de api functies worden aangeroepen.
+
