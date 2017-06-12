@@ -29,7 +29,8 @@ def cb_coordinates(latitude, ns, longitude, ew, pdop, hdop, vdop, epe):
     latStr = str(latitude/1000000.0)
     lngStr = str(longitude/1000000.0)
     
-    print(latStr + "," + lngStr)
+    # print(latStr + "," + lngStr)
+    return tuple(latStr, lngStr)
 
 if __name__ == "__main__":
     ipcon = IPConnection() # Create IP connection

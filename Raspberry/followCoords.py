@@ -5,30 +5,56 @@
 #TI3A
 #Waterknakkers
 #--------------------------------
+from IMU import *
+from GPS import gps_callback
 
-class Coords(self, coordinates):
-    def __init__(self):
+class Coords():
+    def __init__(self, max_power,goal):
+        self.imu.connect()
         # Get the boat's coordinates
-        self.coordinates = 0
-        # Calculate the angle from the boat towards the given coordinates the boat is supposed to go
-        self.angle = coordinates - self.coordinates
+        self.coordinates = gps_callback.cb_coordinates()
+        self.goal = goal
+        self.max_power = max_power/100
 
-    #change incoming value in set range to value in other given range
+    def setGoal(self, newGoal):
+        self.goal = newGoal
+
+    def setCoord(self, coord, number):
+        goal[number] = coord
+
+    # Change human readable values to values used by the boat.
     def map(self, x, in_min, in_max, out_min, out_max):
         return np.clip(int(((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)*100 )/100,out_min,out_max)
 
-    def calcBoatAngle(self):
-        northcoords = 0
+    # Calculate boatangle from starting point 
+    def calcDeltaBoatAngle(self):
+        H, R, P = self.imu.get_orientation()
+        currentBoatAngle = H
+        dLng = goal[0] - self.goal[0]
+        dLat = goal[1] - self.goal[1]
+        
+        East = 0 if dLng < 0 else East = 1
+        North = 0 if dLat < 0 else North = 1
+        
+        if(North == 1 & East == 1):
+            desiredAngle = math.atan(dLat / dLng)
+        if(North == 0 & East == 1):
+            desiredAngle = math.atan((dLat *-1) / dLng) + 90
+        if(North == 0 & East == 0):
+            desiredAngle = (math.atan((dLat *-1) / (dLng * -1)) + 180) - 360
+        if(North == 1 & East == 0):
+            desiredAngle = (math.atan(dLat / (dLng * -1)) + 270) - 360
 
-    def calcBoatAngleDifference(self):
-        # Adjust the boat angularly
-        if(calcBoatAngle != self.angle):
-            turnBoat(calcBoatAngle - self.angle)
+        return desiredAngle - currentBoatAngle
 
-    def turnBoat(self, angle):
-        if(angle > 0):
+
+    def run(self):
+        if(calcDeltaBoatAngle() > 0):
             # Turn clockwise
-            return 0
-        elif(angle < 0):
+            motorL = motorR = self.max_power
+        elif(calcDeltaBoatAngle() < 0):
             # Turn counter clockwise
-            return 0
+            
+
+coord = Coords()
+coord.calcBoatAngle(9)
