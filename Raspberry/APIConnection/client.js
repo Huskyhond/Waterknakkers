@@ -134,7 +134,7 @@ gpspy.on('message', function (message) {
                 initialize = false
                 temperature = data.main.temp
                 queue.push({outsideTemperature : temperature})
-                console.log('Current temperature in ' + data.name + ' is ' + temperature + ' °C')
+                controllerpy.send(JSON.stringify([temperature]))
             })
 
 
