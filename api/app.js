@@ -32,7 +32,7 @@ MongoClient.connect('mongodb://localhost:27017/waterknakkers', function(err, db)
 })
 
 app.use(express.static(__dirname + '/client'))
-app.post('/login', api.authenticate)
+app.post('/login', api.login)
 
 // authentication algorithm for websockets
 function authenticate(socket, data, callback) {

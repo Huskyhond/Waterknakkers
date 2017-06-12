@@ -6,8 +6,9 @@ var gpspy = new PythonShell('../GPS/get_gps.py')
 var controllerpy = new PythonShell('../boatController.py')
 
 var controllable, followQuay
-var coords = [51.897184, 4.4178663] // hard coded -> RDM's location
+var coords = [] // hard coded -> RDM's location
 var queue = []
+var initialize = true
 var tokenRequestOptions = {
     url: config.host + "/login",
     method: 'POST',
@@ -21,10 +22,6 @@ var temperatureRequestOptions = {
     //headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
     qs: { 'lat': coords[0], 'lon': coords[1], 'units': 'metric', 'APPID': '9977c05ce186bfe3c57ee3dbba5ef581' }
 }
-
-httpRequest(temperatureRequestOptions, function (data) {
-    console.log('Current temperature in ' + data.name + ' is ' + data.main.temp + ' °C')
-})
 
 var authenticatedOnly = function () {
     console.log("Boat authenticated")
@@ -57,13 +54,6 @@ var authenticatedOnly = function () {
         }
     }, 100)
 
-}
-
-var options = {
-    url: config.host + "/login",
-    method: 'POST',
-    headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-    form: { 'username': 'anna', 'password': 'waterknakkers' }
 }
 
 socket.on('connect', function () {
@@ -119,22 +109,33 @@ function httpRequest(options, callback) {
 }
 var gpsIterations = 0
 var latT = 0, lngT = 0
-setInterval(function() {
-  gpspy.send()
-}, 1000/10)
+setInterval(function () {
+    gpspy.send()
+}, 1000 / 10)
 
 gpspy.on('message', function (message) {
-  var msgParsed = JSON.parse(message)
-  gpsIterations++
-  latT += msgParsed[0]
-  lngT += msgParsed[1]
-  // On rec of a coordinate.
-  if(gpsIterations > 9) { // Send location every second (location is average of 10 calls)
-    var lat = latT/gpsIterations
-    var lng = lngT/gpsIterations
-    queue.push({ sensors: {}, location: [lat,lng] })
-    latT = lngT = gpsIterations = 0
-  }
+    var msgParsed = JSON.parse(message)
+    gpsIterations++
+    latT += msgParsed[0]
+    lngT += msgParsed[1]
+
+    // On rec of a coordinate.
+    if (gpsIterations > 9) { // Send location every second (location is average of 10 calls)
+        var lat = latT / gpsIterations
+        var lng = lngT / gpsIterations
+
+        if (initialize) {
+            coords = [lat, lng]
+            httpRequest(temperatureRequestOptions, function (data) {
+                initialize = false
+                console.log('Current temperature in ' + data.name + ' is ' + data.main.temp + ' °C')
+            })
+
+
+        }
+        queue.push({ sensors: {}, location: [lat, lng] })
+        latT = lngT = gpsIterations = 0
+    }
 })
 
-gpspy.on('end', function(err) { console.log('ERROR OF GPS', err) })
+gpspy.on('end', function (err) { console.log('ERROR OF GPS', err) })

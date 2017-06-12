@@ -1,6 +1,6 @@
 Documentatie
 
-#API
+###API
 
 De API is de tussenlaag van de eindgebruiker en de boten. De boten kunnen worden bestuurd met API calls via WebSockets. Een gebruiker kan vanuit zijn WebBrowser commando’s sturen naar de API, de API stuurt de data dan door naar de gegeven boot.
 
@@ -33,15 +33,27 @@ var socket = io();
 Je kan in de io als eerste parameter ook een ip en poort opgeven als de client niet dezelfde host heeft. Nadat je geauthentiseerd bent met de server kan je aan de slag.
 
 **Emit**
+*   authentication - Geef een valide authenticatie token als payload van de functie.
 *	getBoats – Vraag een boot emit aan de server, ontvang deze met on(‘getBoats’)
 
 **On**
+*   authenticated - Response op emit 'authentication' als deze geslaagt is.
+*   unautherized - Reponse op emit 'authenticatino als deze mislukt is, hierna word de socket meteen gesloten.
 *	boatConnected – Als er een nieuwe boot is geconnect tijdens je sessie.
 *	boatDisconnected – Als er een boot geen internet meer heeft.
 *	getBoats – Ontvang alle verbonden boten van de server. (eerst emitten)
 *	controller – Ontvang de motor en rudder informatie (Je kan deze alleen ontvangen als je je als boot geauthentiseerd hebt.
-* 
 
 **Authenticatie**
-*   Stuur een HTTP x-www-form-urlencoded POST request naar /login van de host. Key values van dit POST request zijn 'username' en 'password'
-*   
+
+De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappen die onderverdeeld zijn in functies. Hier volgt per functie een uitleg wat hij doet.
+
+*   ```api.login``` - Deze functie neemt ```username``` en ```password``` als parameter. Deze parameters behoren in een HTTP POST request gestuurd te worden naar ```<hostname>/login```. 
+
+    Als de opgegeven username en password correct is krijg je een response met een ```token``` die gebruikt kan worden om je te authoriseren met de WebSocket.  De request dient ```x-www-form-urlencoded``` te zijn. 
+
+    ```JS
+    { token: 'examplereponsetoken'}
+    ```
+
+*   ```authenticate``` - Deze functie neemt als parameter een token verkregen uit functie hierboven.

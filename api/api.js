@@ -79,7 +79,7 @@ class Api {
         })
     }
 
-    authenticate(req, res, next) {
+    login(req, res, next) {
         var collection = instance.db.collection('users') // tell mongodb we want to look in the users table
         var sha = crypto.createHash('sha256')
 
