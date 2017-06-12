@@ -1,25 +1,32 @@
-import requests,json, subprocess, os
+import requests
+import json
+import subprocess
+import os
 #import simlocator
 
 privateKey = "AIzaSyD5UM68eHOiAlj02tVqsQmF-wu52VRucWA"
-url = "https://www.googleapis.com/geolocation/v1/geolocate?key="+privateKey
+url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + privateKey
+
 
 def getLocationWifi(accessPointMacAdress, dbm, channel):
-    payload = {'considerIp':'false','wifiAccessPoints':[{"macAddress": accessPointMacAdress, "signalStrength":dBm, "channel":channel}]}
+    payload = {'considerIp': 'true', 'wifiAccessPoints': [
+        {"macAddress": accessPointMacAdress, "signalStrength": dBm, "channel": channel}]}
     jsonPayload = json.dumps(payload)
-    r = requests.post(url,data = jsonPayload)
+    r = requests.post(url, data=jsonPayload)
     response = json.loads(r.text)
-    #return (response['location']['lat'],response['location']['lng'],response['accuracy'])
+    # return (response['location']['lat'],response['location']['lng'],response['accuracy'])
     return response
 
+
 def getAccessPointMacAddress(accessPointName):
-    operatingSystems = {'nt':'Windows','posix':'Linux'}
+    operatingSystems = {'nt': 'Windows', 'posix': 'Linux'}
 
     if operatingSystems[os.name] is not 'Windows':
         print('Error: OS is not Windows')
-        return 0
+        return (0, 0, 0)
 
-    r = subprocess.check_output(["netsh", "wlan", "show", "network", "mode=bssid"])
+    r = subprocess.check_output(
+        ["netsh", "wlan", "show", "network", "mode=bssid"])
 
     out = []
     buffer = ""
@@ -35,11 +42,11 @@ def getAccessPointMacAddress(accessPointName):
         elif char is 'r' and found:
             found = False
             continue
-        buffer+=char
-    
+        buffer += char
+
     APFound = False
     mac = signal = channel = ""
-    
+
     for line in out:
         if accessPointName in line:
             APFound = True
@@ -55,16 +62,16 @@ def getAccessPointMacAddress(accessPointName):
             break
 
     try:
-        mac = mac.split(": ",1)[1]
-        signal = signal.split(": ",1)[1].split("%",1)[0]
-        channel = channel.split(": ",1)[1]
+        mac = mac.split(": ", 1)[1]
+        signal = signal.split(": ", 1)[1].split("%", 1)[0]
+        channel = channel.split(": ", 1)[1]
         dBm = (int(signal) / 2) - 100
+        print(mac, signal, channel, dBm)
     except:
         print('Accesspoint not found')
-        return 0
+        return (0, 0, 0)
     return (mac, dBm, channel)
 
-        
 
 '''
 def getLocation3G():
@@ -80,5 +87,5 @@ def getLocation3G():
     response = json.loads(r.text)
 '''
 
-mac, dBm, channel = getAccessPointMacAddress("eduroam")
+mac, dBm, channel = getAccessPointMacAddress("Ziggo8CEDE8F")
 print(getLocationWifi(mac, dBm, channel))

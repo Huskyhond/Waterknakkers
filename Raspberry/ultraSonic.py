@@ -3,67 +3,65 @@ import time
 import RPi.GPIO as GPIO
 import atexit
 
+
 def exit_handler():
-  GPIO.cleanup()
+    GPIO.cleanup()
+
 
 class Ping:
-  def __init__(self, temperature = 20):
-    # Use BCM GPIO references, instead of physical pin numbers
-    GPIO.setmode(GPIO.BCM)
+    def __init__(self, temperature=20):
+        # Use BCM GPIO references, instead of physical pin numbers
+        GPIO.setmode(GPIO.BCM)
 
-    # Define GPIO to use on Pi
-    self.GPIO_PINS = [[2,3],[23,24],[17,27]] #[[Trig,Echo],] GPIO references for the (3)ultra sonic sensors
+        # Define GPIO to use on Pi
+        # [[Trig,Echo],] GPIO references for the (3)ultra sonic sensors
+        self.GPIO_PINS = [[2, 3], [23, 24], [17, 27]]
 
-    # Speed of sound in cm/s at temperature
-    self.temperature = temperature
-    self.speedSound = 33100 + (0.6*self.temperature)
+        # Speed of sound in cm/s at temperature
+        self.temperature = temperature
+        self.speedSound = 33100 + (0.6 * self.temperature)
 
-    print("Speed of sound is",self.speedSound/100,"m/s at ",self.temperature,"deg")
+        print("Speed of sound is", self.speedSound /
+              100, "m/s at ", self.temperature, "deg")
 
-    # Set pins as output and input
-    GPIO.setup(self.GPIO_PINS[0][0], GPIO.OUT)  # Trigger
-    GPIO.setup(self.GPIO_PINS[0][1], GPIO.IN)   # Echo
+        # Set pins as output and input
+        GPIO.setup(self.GPIO_PINS[0][0], GPIO.OUT)  # Trigger
+        GPIO.setup(self.GPIO_PINS[0][1], GPIO.IN)   # Echo
 
-    GPIO.setup(self.GPIO_PINS[1][0], GPIO.OUT)  # Trigger
-    GPIO.setup(self.GPIO_PINS[1][1], GPIO.IN)   # Echo
+        GPIO.setup(self.GPIO_PINS[1][0], GPIO.OUT)  # Trigger
+        GPIO.setup(self.GPIO_PINS[1][1], GPIO.IN)   # Echo
 
-    GPIO.setup(self.GPIO_PINS[2][0], GPIO.OUT)  # Trigger
-    GPIO.setup(self.GPIO_PINS[2][1], GPIO.IN)   # Echo
+        GPIO.setup(self.GPIO_PINS[2][0], GPIO.OUT)  # Trigger
+        GPIO.setup(self.GPIO_PINS[2][1], GPIO.IN)   # Echo
 
-    # Set triggers to False (Low)
-    GPIO.output(self.GPIO_PINS[0][0], False)
-    GPIO.output(self.GPIO_PINS[1][0], False)
-    GPIO.output(self.GPIO_PINS[2][0], False)
+        # Set triggers to False (Low)
+        GPIO.output(self.GPIO_PINS[0][0], False)
+        GPIO.output(self.GPIO_PINS[1][0], False)
+        GPIO.output(self.GPIO_PINS[2][0], False)
 
-    #Set cleanup at exit
-    atexit.register(exit_handler)
-    
-    # Allow module to settle
-    time.sleep(0.5)
+        # Set cleanup at exit
+        atexit.register(exit_handler)
 
-  def measure(self, sensor):
-    # This function measures a distance
-    GPIO.output(self.GPIO_PINS[sensor][0], True)
-    # Wait 10us
-    time.sleep(0.00001)
-    GPIO.output(self.GPIO_PINS[sensor][0], False)
-    start = time.time()
-    
-    while GPIO.input(self.GPIO_PINS[sensor][1])==0:
-      start = time.time()
+        # Allow module to settle
+        time.sleep(0.5)
 
-    while GPIO.input(self.GPIO_PINS[sensor][1])==1:
-      stop = time.time()
+    def measure(self, sensor):
+        # This function measures a distance
+        GPIO.output(self.GPIO_PINS[sensor][0], True)
+        # Wait 10us
+        time.sleep(0.00001)
+        GPIO.output(self.GPIO_PINS[sensor][0], False)
+        start = time.time()
 
-    elapsed = stop-start
-    distance = (elapsed * self.speedSound)/2
+        while GPIO.input(self.GPIO_PINS[sensor][1]) == 0:
+            start = time.time()
 
-    #Wait 20ms
-    time.sleep(0.02)
-    return distance
+        while GPIO.input(self.GPIO_PINS[sensor][1]) == 1:
+            stop = time.time()
 
-    
+        elapsed = stop - start
+        distance = (elapsed * self.speedSound) / 2
 
-
-
-    
+        # Wait 20ms
+        time.sleep(0.02)
+        return distance
