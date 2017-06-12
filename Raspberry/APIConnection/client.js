@@ -6,7 +6,7 @@ var gpspy = new PythonShell('../GPS/get_gps.py')
 var controllerpy = new PythonShell('../boatController.py')
 
 var controllable, followQuay
-var coords = [] // hard coded -> RDM's location
+var temperature = undefined
 var queue = []
 var initialize = true
 var tokenRequestOptions = {
@@ -20,7 +20,7 @@ var temperatureRequestOptions = {
     url: 'http://api.openweathermap.org/data/2.5/weather',
     method: 'GET',
     //headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-    qs: { 'lat': 0, 'lon': 1, 'units': 'metric', 'APPID': '9977c05ce186bfe3c57ee3dbba5ef581' }
+    qs: { 'lat': undefined, 'lon': undefined, 'units': 'metric', 'APPID': '9977c05ce186bfe3c57ee3dbba5ef581' }
 }
 
 var authenticatedOnly = function () {
@@ -124,13 +124,15 @@ gpspy.on('message', function (message) {
         var lat = latT / gpsIterations
         var lng = lngT / gpsIterations
 
-        if (initialize) {
+        if (initialize) { // get the innitial location of the boat to determine outside temperature
             temperatureRequestOptions.qs.lat = lat
             temperatureRequestOptions.qs.lon = lng
+
             httpRequest(temperatureRequestOptions, function (data) {
-                console.log(data)
                 initialize = false
-                console.log('Current temperature in ' + data.name + ' is ' + data.main.temp + ' °C')
+                temperature = data.main.temp
+                queue.push({outsideTemperature : temperature})
+                console.log('Current temperature in ' + data.name + ' is ' + temperature + ' °C')
             })
 
 
