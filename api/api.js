@@ -30,7 +30,7 @@ class Api {
         console.log('Sending data to boat: ' + data.boat)
         var socket = instance.getConnection(data.boat)
         if (socket) {
-	    data.timestamp =  Date.now()
+            data.timestamp = Date.now()
             socket.emit('controller', data)
         }
     }
@@ -46,9 +46,7 @@ class Api {
     }
 
     disconnect() {
-        console.log('disconnected')
         if (this.isBoat) {
-            console.log('Disconnected boat')
             instance.io.sockets.emit('boatDisconnected', { boat: { id: this.boatId, name: this.name } })
         }
         var index = instance.connections.indexOf(this)
@@ -95,16 +93,10 @@ class Api {
                         isValid: 1
                     }
                 }) // put a valid token into the database
-
-                res.setHeader('Content-Type', 'application/json') // give the valid token as a http(s) response
-                res.write(
-                    JSON.stringify({
-                        'token': _token
-                    }))
-                res.end()
+                httpReponse(res, { token: _token }, 0) //send HTTP reponse to user with custom payload. 
             } else {
-                if (err) errorReceived(res, err) // send the error in a json response if occured
-                errorReceived(res, 'Invalid username or password')
+                if (err) httpReponse(res, 0, err) // send the error in a json response if occured
+                httpReponse(res, 0, 'Invalid username or password')
             }
         })
     }
@@ -114,18 +106,26 @@ class Api {
         collection.findOne({ token: token, isValid: 1 }, callback)
     }
 
-    formatInput(input){ // format JSON string to JSON objects
-        if(typeof(input) === 'object') return input
+    logout(username) {
+        var collection = instance.db.collection('users')
+        collection.update({ username: username }, {
+            $set: {
+                isValid: 0
+            }
+        })
+    }
+
+    formatInput(input) { // format JSON string to JSON objects
+        if (typeof (input) === 'object') return input
         var output = {}
         try {
             output = JSON.parse(input)
-        }    
-        catch(e){
+        }
+        catch (e) {
             // No object. Ignore
         }
         return output
     }
-
 }
 
 // generate a pseudo-random 40 character string
@@ -133,12 +133,13 @@ var generateToken = function () {
     return crypto.randomBytes(20).toString('hex')
 }
 
-// return any error that occured to the user as a JSON response
-var errorReceived = function (res, err) {
+// send a http reponse to the user
+var httpReponse = function (res, payload, err) {
     res.setHeader('Content-Type', 'application/json')
     res.write(
         JSON.stringify({
-            'error': err
+            'error': err,
+            payload
         }));
     res.end();
 }

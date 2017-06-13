@@ -15,7 +15,11 @@ var tokenRequestOptions = {
     url: config.host + "/login",
     method: 'POST',
     headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
+<<<<<<< HEAD
     form: { 'username': config.username, 'password': config.password }
+=======
+    form: { 'username': 'anna', 'password': 'waterknakkers' }
+>>>>>>> 831e578db7cf8df86e890ba04485c0d0f9908927
 }
 
 var temperatureRequestOptions = {
@@ -60,21 +64,37 @@ var authenticatedOnly = function () {
 
 socket.on('connect', function () {
     httpRequest(tokenRequestOptions, function (data) {
-        console.log('Recieved auth token', data.token)
-        socket.emit('authentication', { token: data.token })
+        if (!data.error) {
+            console.log('authing...')
+            socket.emit('authentication', { token: data.payload.token })
+        } else {
+            console.log(data) // 
+        }
     })
+})
+
+socket.on('unauthorized', function (err) {
+    console.log('unauthorized')
+    console.log(err)
 })
 
 socket.on('authenticated', authenticatedOnly)
 
-socket.on('unautherized', function (err) {
-    console.log("unautherized")
-    console.log(err)
-})
-
 socket.on('disconnect', function () {
     console.log('disconnected')
 })
+
+function httpRequest(options, callback) {
+    request(options, function (err, res, body) {
+        if (!err && res.statusCode == 200) {
+            var paredBody = JSON.parse(body) // response is a string, so we parse it back to a JSON object
+            console.log('Recieved http response')
+            callback(paredBody)
+        } else {
+            callback({ error: 'HTTP request error' })
+        }
+    })
+}
 
 controllerpy.on('message', function (message) {
     console.log(message)
@@ -97,18 +117,6 @@ controllerpy.on('message', function (message) {
     }
 })
 
-
-function httpRequest(options, callback) {
-    request(options, function (err, res, body) {
-        if (!err && res.statusCode == 200) {
-            var paredBody = JSON.parse(body) // response is a string, so we parse it back to a JSON object
-            console.log('Recieved http response')
-            callback(paredBody)
-        } else {
-            callback(null)
-        }
-    })
-}
 var gpsIterations = 0
 var latT = 0, lngT = 0
 setInterval(function () {

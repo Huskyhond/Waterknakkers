@@ -2,13 +2,14 @@
   "name": "api",
   "version": "1.0.0",
   "description": "Documentatie",
-  "main": "api.js",
+  "main": "app.js",
   "dependencies": {
     "express": "^4.15.3",
     "mongodb": "^2.2.27",
     "socket.io": "^2.0.1",
-    "socketio-auth": "^0.1.0",
-    "body-parser": "^1.17.2"
+    "lodash": "^4.17.4",
+    "body-parser": "^1.17.2",
+    "crypto": "^0.0.3"
   },
   "devDependencies": {},
   "scripts": {
