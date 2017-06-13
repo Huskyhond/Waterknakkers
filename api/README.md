@@ -48,9 +48,21 @@ Je kan in de io als eerste parameter ook een ip en poort opgeven als de client n
 
 De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappen die onderverdeeld zijn in functies. Hier volgt per functie een uitleg wat hij doet.
 
-*   ```api.login``` - Deze functie neemt ```username``` en ```password``` als parameter. Deze parameters behoren in een HTTP POST request gestuurd te worden naar ```<hostname / ip-address>/login```. Deze hostname / ip-address dient te worden geconfigureerd in ```config.js``` 
-
+*   ```api.login``` - Deze functie neemt ```username``` en ```password``` als parameter. Deze parameters behoren in een HTTP POST body te staan ```<hostname / ip-address>/login```. Deze hostname / ip-address dient te worden geconfigureerd in ```config.js```
+    
     Als de opgegeven username en password correct is krijg je een response met een ```token``` die gebruikt kan worden om je te authoriseren met de WebSocket.  De request dient ```x-www-form-urlencoded``` te zijn. 
+
+    Hier een voorbeeld van een HTTP POST request naar ```localhost/login```
+
+    ```JS
+    var tokenRequestOptions = {
+        url: 'localhost/login',
+        method: 'POST',
+        headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
+        form: { 'username': 'demo', 'password': 'example' }
+    }
+    ```
+
 
     succesvol voorbeeld  HTTP reponse
     ```JS
@@ -67,9 +79,10 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
         socket.emit('authentication', token)
     })
     ```
-    Als de token foutief of niet geldig blijkt te zijn zal de server een ```unautherized``` event sturen. Hierna zal de connectie direct worden beeindigt.
+    Als de token foutief of niet geldig blijkt te zijn zal de server een ```unautherized``` event sturen. Hierna zal de connectie direct worden verbroken.
 
     Als de token geldig is zal de server een ```autherized``` event sturen en word de verbinding toegestaan en kunnen de api functies worden aangeroepen.
 
-*   ```postAuthenticate``` - 
+*   ```postAuthenticate``` - Hierin staan de functies die aangeroepen kunnen worden nadat de client connected en authorized is. Hier word nog een extra keer gekeken of de WebSocket een auth flag bevat.
+
 
