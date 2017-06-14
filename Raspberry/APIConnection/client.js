@@ -15,11 +15,7 @@ var tokenRequestOptions = {
     url: config.host + "/login",
     method: 'POST',
     headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-<<<<<<< HEAD
     form: { 'username': config.username, 'password': config.password }
-=======
-    form: { 'username': 'anna', 'password': 'waterknakkers' }
->>>>>>> 831e578db7cf8df86e890ba04485c0d0f9908927
 }
 
 var temperatureRequestOptions = {
@@ -58,6 +54,7 @@ var authenticatedOnly = function () {
     setInterval(function () {
         if (queue.length > 0) {
             var data = queue.shift()
+	    data.timestamp = Date.now()
             socket.emit('info', data)
         }
     }, 100)
@@ -144,6 +141,7 @@ gpspy.on('message', function (message) {
             httpRequest(temperatureRequestOptions, function (data) {
                 initialize = false
                 temperature = data.main.temp
+		console.log('current outside temperature %s', temperature)
                 queue.push({outsideTemperature : temperature})
                 controllerpy.send(JSON.stringify([temperature]))
             })

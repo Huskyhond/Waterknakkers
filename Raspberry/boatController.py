@@ -24,6 +24,10 @@ while True:
 		# Parse to python json object (list)
 		jsonObj = json.loads(userinput)
 		# Put values in correct variables
+		if len(jsonObj) ==1:
+			temp = jsonObj[0]
+			continue
+
 		engineLeft = jsonObj[0]
 		engineRight = jsonObj[1]
 		rudder = jsonObj[2]
