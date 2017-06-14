@@ -19,6 +19,7 @@ socket.on('unauthorized', function (err) {
 
 socket.on('info', function(data) {
     if(data.id == boatSelected) {
+	setUiPing(data.id, data.info.timestamp, Date.now());
         $('#console').append('<div>' + JSON.stringify(data.info) + '</div>');
     }
     
@@ -69,6 +70,13 @@ $(document).ready(function() {
     });
 
 });
+
+function setUiPing(boatId, boatTimestamp, clientTimestamp) {
+	var ping = clientTimestamp - boatTimestamp;
+	var parent = $("input[value="+ boatId +"]").parent();
+	parent.find('span').remove()
+	$("<span>").html(getBoatById(boatId).name + " (" + ping + "ms)").appendTo(parent);
+}
 
 function getBoatById(id) {
     for(var i in boats) {
