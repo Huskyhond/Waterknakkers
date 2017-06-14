@@ -4,9 +4,9 @@ var socket = io();
 
 
 socket.on('connect', function(){
+    socket.emit('authentication', {token : '918d87a8171860a8e5181a0f249bccff98378278'});
 });
 
-socket.emit('authentication', {token : 'e953a2b2df155eead6bd4e8cf96a30345df2b729'});
 
 socket.on('authenticated', function (){
     console.log('client authenticated!')
@@ -29,8 +29,6 @@ socket.on('info', function(data) {
 })
 
 socket.on('getBoats', function(boatsin) {
-    console.log(boats);
-    console.log(boatsin);
     for(var i in boatsin.boats) {
         boats.push(boatsin.boats[i]);
     }
