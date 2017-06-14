@@ -27,8 +27,8 @@ while True:
 		engineLeft = jsonObj[0]
 		engineRight = jsonObj[1]
 		rudder = jsonObj[2]
-		#if jsonObj.length > 3:
-		#	followQuay = jsonObj[3]
+		if len(jsonObj) > 3:
+			followQuay = jsonObj[3]
 		# If controllable send data to arduino.
 		if c.controllable:
 			# Start following the quay wall
@@ -48,8 +48,7 @@ while True:
 			# Stop the follow quay wall thread if boat is not controllable
 			if f.running:
 				f.stop()
-		print(json.dumps({'controllable':c.controllable}))
 				
-				
+		print(json.dumps({'controllable': c.controllable, 'followQuay': f.running}))
 
 	sys.stdout.flush()

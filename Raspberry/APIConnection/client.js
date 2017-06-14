@@ -20,8 +20,10 @@ var authenticatedOnly = function() {
         var now = Date.now()
         var delay = now - data.timestamp
         console.log("Delay in ms:", delay, data.timestamp, now)
-
+	console.log(data)
         var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
+	if(data.followQuay === true || data.followQuay === false)
+		boatData.push(data.followQuay)
         // Dont bother the arduino if the delay between the sockets is too much.
 	console.log('delay', delay, 'controllable', controllable)
         //if(delay > 200 && controllable) {
