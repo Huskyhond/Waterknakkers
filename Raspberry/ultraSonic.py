@@ -15,7 +15,7 @@ class Ping:
 
         # Define GPIO to use on Pi
         # [[Trig,Echo],] GPIO references for the (3)ultra sonic sensors
-        self.GPIO_PINS = [[2, 3], [23, 24], [17, 27]]
+        self.GPIO_PINS = [[17, 27], [23, 24], [25,8]]
 
         # Speed of sound in cm/s at temperature
         self.temperature = temperature
@@ -65,3 +65,11 @@ class Ping:
         # Wait 20ms
         time.sleep(0.02)
         return distance
+
+def test():
+    p = Ping()
+    while True:
+        print(p.measure(0),p.measure(1),p.measure(2))
+
+#test()
+
