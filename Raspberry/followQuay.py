@@ -58,7 +58,14 @@ class Follow:
     def map(self, x, in_min, in_max, out_min, out_max):
         # Change incoming value in set range to value in other given range
         # Round the output on 2 decimals and clips the output value between the out_min and out_max interval
-        return np.clip(int(((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)*100 )/100,out_min,out_max)
+        x *= 100
+        in_min *= 100
+        in_max *= 100
+        out_min *= 100
+        out_max *= 100
+        res = np.clip( ((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min) , out_min, out_max)
+
+        return float(res)/100
 
     def getPings(self):
         if isLinux: pings = [self.p.measure(2),self.p.measure(1)]
@@ -75,20 +82,21 @@ class Follow:
         # Set the default motor power to max_motorPower
         motorL = motorR = self.max_motorPower
 
+        print(boatAngle)
         # Steer boat to right
         if boatAngle < 90: 
             if self.debug: print("Steer Right")
             # Adjust motorR speed in range from 0 to the max_self.max_motorPower
-            motorR = self.map(boatAngle, -90, 90, 0, self.max_motorPower)*2
+            motorR = self.map(boatAngle, 60, 90, 0, 1)
         
         # Steer boat to left
         else: 
             if self.debug: print("Steer Left")
             # Adjust motorL speed in range from 0 to the max_self.max_motorPower
-            motorL = (self.max_motorPower*2)-self.map(boatAngle, -90, 90, 0, self.max_motorPower)*2
+            motorL = self.map(boatAngle, 90, 120, 0, 1)
 
         # Adjust rudder angle to counter steer the boat
-        rudder = self.map(boatAngle, -50, 50, -1, 1)*-1
+        rudder = self.map(boatAngle, -50, 50, -1, 1)
 
         #motorR = 100 + ((boatAngle / 90) * 100)
         #motorL = (1 - (boatAngle / 90)) * 100
@@ -138,14 +146,12 @@ def foo(x,y,z):
     pass
 
 def test():
-    f = Follow(foo, 50, sensorAngle=45, debug = True)
+    f = Follow(foo, 100, sensorAngle=45, debug = True)
     f.start()
     sleep(60)
     f.stop()
 
 
-test()
-#angle = math.degrees(math.asin((54 * math.sin(math.radians(45)))/38))
-
+#test()
 
 
