@@ -1,4 +1,8 @@
-#from ultraSonic import Ping
+import platform
+isLinux = False
+if "Linux" in platform.system():
+    from ultraSonic import Ping
+    isLinux = True
 import math
 import numpy as np
 import threading as th
@@ -12,6 +16,7 @@ class Follow:
         self.t = None                               # The thread to follow the quay wall
         self.running = False                        # Boolean to indicate the state of t 
         self.cb = callback                          # The callback that drives the boat
+        if isLinux: self.p = Ping()
 
     def calcBoatAngle(self, sensorDistances):
         # Sensor1: the sensor perpendicular to the boat facing the quay wall
@@ -32,32 +37,66 @@ class Follow:
         #a = (errorDistance * math.sin(math.radians(180-self.sensorAngle)))
         return angle
 
+    def calcAngle(self, sensorDistances):
+        x = sensorDistances[0]
+        y = sensorDistances[1]
+        sensorAngle = self.sensorAngle
+        wall = math.sqrt(math.pow(x,2) + math.pow(y,2) - 2*x*y*math.cos(math.radians(sensorAngle)))
+        angle1 = math.degrees(math.asin(((y*math.sin(math.radians(sensorAngle)))/wall)))
+        angle2 = math.degrees(math.asin(((x*math.sin(math.radians(sensorAngle)))/wall)))
+
+        if x > y:
+            angle3 = 180 - 45 - angle1
+            return angle3
+            #print(wall,angle3,angle1)
+        else:
+            angle3 = 180 - 45 - angle2
+            return angle3
+            #print(wall,angle3,angle2)
+
     
     def map(self, x, in_min, in_max, out_min, out_max):
         # Change incoming value in set range to value in other given range
         # Round the output on 2 decimals and clips the output value between the out_min and out_max interval
-        return np.clip(int(((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)*100 )/100,out_min,out_max)
+        x *= 100
+        in_min *= 100
+        in_max *= 100
+        out_min *= 100
+        out_max *= 100
+        res = np.clip( ((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min) , out_min, out_max)
+
+        return float(res)/100
+
+    def getPings(self):
+        if isLinux: pings = [self.p.measure(2),self.p.measure(1)]
+        else: pings = [4,7.62]
+        if self.debug: print(pings)
+        return pings
 
     def adjustBoat(self):
         # Calculate the angle of the boat using the ultrasonic sensors
-        boatAngle = self.calcBoatAngle([4,10]) 
+        #boatAngle = self.calcBoatAngle([4,10]) 
+        boatAngle = self.calcAngle(self.getPings()) 
+        
+        
         # Set the default motor power to max_motorPower
         motorL = motorR = self.max_motorPower
 
+        print(boatAngle)
         # Steer boat to right
-        if boatAngle < 0: 
+        if boatAngle < 90: 
             if self.debug: print("Steer Right")
             # Adjust motorR speed in range from 0 to the max_self.max_motorPower
-            motorR = self.map(boatAngle, -90, 90, 0, self.max_motorPower)*2
+            motorR = self.map(boatAngle, 60, 90, 0, 1)
         
         # Steer boat to left
         else: 
             if self.debug: print("Steer Left")
             # Adjust motorL speed in range from 0 to the max_self.max_motorPower
-            motorL = (self.max_motorPower*2)-self.map(boatAngle, -90, 90, 0, self.max_motorPower)*2
+            motorL = self.map(boatAngle, 90, 120, 0, 1)
 
         # Adjust rudder angle to counter steer the boat
-        rudder = self.map(boatAngle, -50, 50, -1, 1)*-1
+        rudder = self.map(boatAngle, -50, 50, -1, 1)
 
         #motorR = 100 + ((boatAngle / 90) * 100)
         #motorL = (1 - (boatAngle / 90)) * 100
@@ -103,15 +142,16 @@ class Follow:
             print("Follow not running")
 
 
-'''
-def foo(x):
-    print(x)
+def foo(x,y,z):
+    pass
 
-f = Follow(foo, 50, debug = False)
-f.start()
-sleep(1)
-f.stop()
-'''
+def test():
+    f = Follow(foo, 100, sensorAngle=45, debug = True)
+    f.start()
+    sleep(60)
+    f.stop()
 
+
+#test()
 
 

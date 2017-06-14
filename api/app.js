@@ -1,4 +1,5 @@
 /* REQUIRES */
+var config = require('./config')
 var endpoints = require('./endpoints')
 var bodyParser = require('body-parser')
 var express = require('express')
@@ -12,7 +13,7 @@ require('./auth.js')(io, {
     authenticate: authenticate, // auth function
     postAuthenticate: postAuthenticate, // post auth function, what to do when connection is allowed
     disconnect: disconnect, // disconnect function
-    timeout: 1000 // timeout in ms
+    timeout: 5000 // timeout in ms
 })
 /* REQUIRES */
 app.use(bodyParser.json()) // support JSON-encoded post bodies
@@ -24,7 +25,7 @@ MongoClient.connect('mongodb://localhost:27017/waterknakkers', function (err, db
     api.setDatabase(db)
     console.log('Database connected')
 
-    server.listen(80, function () {
+    server.listen(config.listenPort, function () {
         console.log('web server is running at http://localhost')
     })
 })
