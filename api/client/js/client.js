@@ -4,13 +4,13 @@ var socket = io();
 
 
 socket.on('connect', function(){
-    socket.emit('getBoats');
 });
 
 socket.emit('authentication', {token : 'e953a2b2df155eead6bd4e8cf96a30345df2b729'});
 
 socket.on('authenticated', function (){
     console.log('client authenticated!')
+    socket.emit('getBoats');
 })
 
 socket.on('unauthorized', function (err) {
@@ -20,6 +20,11 @@ socket.on('unauthorized', function (err) {
 socket.on('info', function(data) {
     if(data.id == boatSelected) {
         $('#console').append('<div>' + JSON.stringify(data.info) + '</div>');
+    }
+    
+    if(data.info && data.info.location) {
+        addToMap(data.info.location)
+        setStartPosition(data.info.location, getBoatById(data.id).name)
     }
 })
 
@@ -67,6 +72,14 @@ $(document).ready(function() {
 
 });
 
+function getBoatById(id) {
+    for(var i in boats) {
+        if(boats[i].id == id)
+            return boats[i];
+    }
+    return false;
+}
+
 function updateBoats() {
     var parent = $("#boatRadios");
     parent.empty();
@@ -98,9 +111,17 @@ function updateBoats() {
 
 var viewport = $( window ).width() - 5;
 var leftWidth = 360;
+
+
 $(document).ready(function() {
     $("#left").width(leftWidth);
     $("#right").width(viewport - leftWidth);
+    $('#startQuay').on('click', function() {
+	socket.emit('controller', { boat: boatSelected, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: true});
+    });
+    $('#stopQuay').on('click', function() {
+	socket.emit('controller', { boat: boatSelected, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: false});
+    });
 });
 
 $(window).resize(function() {

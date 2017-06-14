@@ -1,7 +1,5 @@
 /* REQUIRES */
-var config = require('./config.js')
 var endpoints = require('./endpoints')
-
 var bodyParser = require('body-parser')
 var express = require('express')
 var app = express()
@@ -10,11 +8,11 @@ var io = require('socket.io').listen(server)
 var api = require('./api')(io)
 var MongoClient = require('mongodb').MongoClient
 
-require('socketio-auth')(io, {
+require('./auth.js')(io, {
     authenticate: authenticate, // auth function
     postAuthenticate: postAuthenticate, // post auth function, what to do when connection is allowed
     disconnect: disconnect, // disconnect function
-    timeout: 10000 // timeout in ms
+    timeout: 1000 // timeout in ms
 })
 /* REQUIRES */
 app.use(bodyParser.json()) // support JSON-encoded post bodies
@@ -22,33 +20,34 @@ app.use(bodyParser.urlencoded({ // support x-www-form-url encoded post bodies
     extended: true
 }))
 
-MongoClient.connect('mongodb://localhost:27017/waterknakkers', function(err, db) {
-  api.setDatabase(db)
-  console.log('Database connected')
+MongoClient.connect('mongodb://localhost:27017/waterknakkers', function (err, db) {
+    api.setDatabase(db)
+    console.log('Database connected')
 
-  server.listen(config.listenPort, function () {
-    console.log('web server is running at http://' + config.listenAddress + ':' + config.listenPort)
-  })
+    server.listen(80, function () {
+        console.log('web server is running at http://localhost')
+    })
 })
 
 app.use(express.static(__dirname + '/client'))
-app.post('/login', api.authenticate)
+app.post('/login', api.login)
 
 // authentication algorithm for websockets
+// fist parameter is error if any, else null. second parameter is true for succesful or false for unsuccesful
 function authenticate(socket, data, callback) {
     data = api.formatInput(data)
-    api.isTokenValid(data.token, function(err, docs){
-        if (err) return callback(new Error(err))
-        else if(docs === null) return callback(new Error('Invalid token'))
-        else return callback(null, true)
+    api.isTokenValid(data.token, function (err, docs) {
+        if (err) callback(err, false) // error while authing
+        else if (docs === null) callback(null, false) // invalid auth credentials
+        else callback(null, true) // successful
     })
 }
 
 function postAuthenticate(socket, data) {
     socket.sendBuffer = []
-    if(socket.auth){
+    if (socket.auth) {
         api.addConnection(socket)
-        console.log('Socket connected!')
+        //console.log('Socket connected!')
 
         socket.on('controller', api.onMotion)
 
@@ -63,5 +62,11 @@ function postAuthenticate(socket, data) {
 }
 
 function disconnect(socket) {
-    console.log('client with socket id: ' + socket.id + ' disconnected')
+    if (socket.isBoat) {
+        //TODO select on ID rather than on boatname
+        api.logout(socket.name.toLowerCase())
+        console.log('Boat disconnected: %s with id: %s', socket.name, socket.boatId)
+    } else {
+        console.log('client disconnected')
+    }
 }
