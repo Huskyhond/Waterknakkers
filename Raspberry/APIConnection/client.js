@@ -15,11 +15,7 @@ var tokenRequestOptions = {
     url: config.host + "/login",
     method: 'POST',
     headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
-<<<<<<< HEAD
-    form: { 'username': config.username, 'password': config.password }
-=======
     form: { 'username': 'anna', 'password': 'waterknakkers' }
->>>>>>> 831e578db7cf8df86e890ba04485c0d0f9908927
 }
 
 var temperatureRequestOptions = {
