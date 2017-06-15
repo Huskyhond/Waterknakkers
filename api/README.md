@@ -73,14 +73,16 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
     ```JS
     {
         "error": 'example error message',
-        "payload": 0
+        "payload": {
+            "token": 0
+        }
     }
     ```
 *   ```authenticate``` - Deze functie neemt als parameter een token verkregen uit functie hierboven. Deze token moet meegestuurt worden zodra de gebruiker een connectie maakt met de WebSocket. Hieronder is een voorbeeld te zien in JavaScript.
 
     ```JS
     socket.on('connect', function(){
-        socket.emit('authentication', token)
+        socket.emit('authentication', authdata)
     })
     ```
     Als de token foutief of niet geldig blijkt te zijn zal de server een ```unautherized``` event sturen. Hierna zal de connectie direct worden verbroken.
@@ -89,4 +91,5 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
 
 *   ```postAuthenticate``` - Hierin staan de functies die aangeroepen kunnen worden nadat de client connected en authorized is.
 
+*   ```disconnect``` - Deze functie neemt als parameter de huidige socket connectie. Als een boot de WebSocket connectie verbreekt zal zijn token in de database ongeldig worden door middel van de ```api.logout``` functie. 
 
