@@ -49,7 +49,6 @@ function postAuthenticate(socket, data) {
     if (socket.auth) {
         api.addConnection(socket)
         //console.log('Socket connected!')
-
         socket.on('controller', api.onMotion)
 
         socket.on('boatreq', api.joinBoat)
@@ -59,6 +58,8 @@ function postAuthenticate(socket, data) {
         socket.on('disconnect', api.disconnect)
 
         socket.on('info', api.parseInformation)
+	
+	socket.on('pongBoat', api.boatPingsBack)
     }
 }
 

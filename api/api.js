@@ -6,6 +6,8 @@ class Api {
         this.io = io
         this.that = this
         this.connections = []
+	this.boatPings = {}
+	this.pingBoats()
     }
 
     setDatabase(db) {
@@ -14,6 +16,31 @@ class Api {
 
     addConnection(socket) {
         instance.connections.push(socket)
+    }
+
+    pingBoats() {
+	setInterval(function() {
+		var boats = instance.getBoatConnections()
+		for(var i = 0; i < boats.length; i++) {
+			instance.boatPings[boats[i].boatId] = Date.now()
+			boats[i].emit('pingBoat')
+		}
+	}, 2000)
+    }
+	
+    boatPingsBack() {
+	var ping = Date.now() - instance.boatPings[this.boatId] 
+	instance.io.sockets.emit('pong', { boat: this.boatId, ping: ping })
+    }
+
+    getBoatConnections() {
+	var boats = []
+	for(var i = 0; i < instance.connections.length; i++) {
+		if(instance.connections[i].isBoat) {
+			boats.push(instance.connections[i])
+		}
+	}
+	return boats;
     }
 
     getConnection(id) {
@@ -31,6 +58,7 @@ class Api {
         var socket = instance.getConnection(data.boat)
         if (socket) {
             data.timestamp = Date.now()
+	    instance.io.sockets.emit('controlledBoat', data)
             socket.emit('controller', data)
         }
     }
