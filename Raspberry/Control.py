@@ -11,6 +11,7 @@ class Controller:
             print('Serial port opened at:',port, 'baudrate:', baudrate)
             print("Warm-up...")
             sleep(3)
+            print("Serial port Ready!")
             print(self.ser.read(self.ser.inWaiting()))
             self.connected = True   
             self.check()
@@ -18,6 +19,7 @@ class Controller:
             print('Opening Serial port failed, try again or try another port.')
             self.connected = False
             self.controllable = False
+            
 
         print('Connected:',self.connected)
         self.motorL=90

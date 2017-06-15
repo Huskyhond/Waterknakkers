@@ -1,6 +1,4 @@
-Documentatie
-
-###API
+### API
 
 De API is de tussenlaag van de eindgebruiker en de boten. De boten kunnen worden bestuurd met API calls via WebSockets. Een gebruiker kan vanuit zijn WebBrowser commando’s sturen naar de API, de API stuurt de data dan door naar de gegeven boot.
 
@@ -22,6 +20,40 @@ Om de API-server te starten moet er in een terminal sessie het volgende worden g
 ``` 
 node app.js 
 ```
+
+**Veilige verbinding**
+
+Om te zorgen dat we Secure WebSockets hebben gebruiken we een reverse proxy in Nginx. De NodeJS server luistert op poort 3000. De nginx server verwijst naar de Node server en zet de secure connectie zelf op. Hiermee hebben we https over port 443.
+
+``` bash
+upstream NodeRunner {
+    server 127.0.0.1:3000;
+    keepalive 8;
+}
+
+server {
+    listen 443; 
+    server_name domain.com;
+    ssl_certificate /path/to/fullchain.pem
+    ssl_certificate_key /path/to/privkey.pem
+
+    location / {
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_cache_bypass $http_upgrade;
+        proxy_http_version 1.1;
+        proxy_pass NodeRunner;
+        proxy_redirect off;
+    }
+
+}
+
+```
+
 
 **Met de API communiceren**
 
