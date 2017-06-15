@@ -54,7 +54,6 @@ class Follow:
             return angle3
             #print(wall,angle3,angle2)
 
-    
     def map(self, x, in_min, in_max, out_min, out_max):
         # Change incoming value in set range to value in other given range
         # Round the output on 2 decimals and clips the output value between the out_min and out_max interval
@@ -68,35 +67,47 @@ class Follow:
         return float(res)/100
 
     def getPings(self):
-        if isLinux: pings = [self.p.measure(2),self.p.measure(1)]
-        else: pings = [4,7.62]
+        if isLinux: pings = [self.p.measure(0),self.p.measure(1),self.p.measure(2)]
+        else: pings = [4,5.66]
         if self.debug: print(pings)
         return pings
 
     def adjustBoat(self):
         # Calculate the angle of the boat using the ultrasonic sensors
         #boatAngle = self.calcBoatAngle([4,10]) 
-        boatAngle = self.calcAngle(self.getPings()) 
+        pings = self.getPings()
+        boatAngle = self.calcAngle(pings) 
         
         
         # Set the default motor power to max_motorPower
         motorL = motorR = self.max_motorPower
 
         print(boatAngle)
+        # Steer boat to right when front wall in sight
+        if pings[2] < 30:
+            if self.debug: print("Front wall in sight, Steer Right")
+            motorL = 1
+            motorR = -1
+            # Adjust rudder angle to counter steer the boat
+            rudder = 1
+
         # Steer boat to right
-        if boatAngle < 90: 
+        elif boatAngle < 90 : 
             if self.debug: print("Steer Right")
             # Adjust motorR speed in range from 0 to the max_self.max_motorPower
             motorR = self.map(boatAngle, 60, 90, 0, 1)
+            # Adjust rudder angle to counter steer the boat
+            rudder = self.map(boatAngle, 65, 115, -1, 1)*-1
         
         # Steer boat to left
         else: 
             if self.debug: print("Steer Left")
             # Adjust motorL speed in range from 0 to the max_self.max_motorPower
             motorL = self.map(boatAngle, 90, 120, 0, 1)
+            # Adjust rudder angle to counter steer the boat
+            rudder = self.map(boatAngle, 65, 115, -1, 1)*-1
 
-        # Adjust rudder angle to counter steer the boat
-        rudder = self.map(boatAngle, -50, 50, -1, 1)
+        
 
         #motorR = 100 + ((boatAngle / 90) * 100)
         #motorL = (1 - (boatAngle / 90)) * 100
@@ -146,7 +157,7 @@ def foo(x,y,z):
     pass
 
 def test():
-    f = Follow(foo, 100, sensorAngle=45, debug = True)
+    f = Follow(foo, 100, debug = True)
     f.start()
     sleep(60)
     f.stop()
