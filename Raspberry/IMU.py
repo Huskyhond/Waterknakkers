@@ -27,6 +27,13 @@ class IMU:
         self.i = 0
         # Velocity
         self.cvelocity = 0
+        self.ipcon = IPConnection()
+        self.imu = BrickIMUV2(self.UID, self.ipcon)
+
+    def get_orientation(self):
+        data = self.imu.get_all_data()
+        H, R, P = data.euler_angle
+        return round(H/16.0, 2)
 
     # Callback function for all data callback including linear_acceleration
     def cb_all_data(self, acceleration, magnetic_field, angular_velocity,
@@ -77,17 +84,15 @@ class IMU:
 
     def connect(self):
         # Create IP Connection required for the IMU to connect.
-        ipcon = IPConnection()
         # Create an object to use the required functions
-        imu = BrickIMUV2(self.UID, ipcon)
         # Connect the IP connection to the IMU brick
-        ipcon.connect(self.HOST, self.PORT)
+        self.ipcon.connect(self.HOST, self.PORT)
         # Create callback that returns the acceleration of the IMU Brick
         # imu.register_callback(imu.CALLBACK_ALL_DATA, cb_all_data(self.speed))
         # Refresh the timer of the Callback to REFRESH_TIME
-        # imu.set_all_data_period(self.REFRESH_TIME)
+        self.imu.set_all_data_period(self.REFRESH_TIME)
         # input("Press key to exit\n")
         # ipcon.disconnect()
 
     def disconnect(self):
-        ipcon.disconnect()
+        self.ipcon.disconnect()
