@@ -7,15 +7,28 @@ socket.on('connect', function(){
     socket.emit('authentication', {token : '918d87a8171860a8e5181a0f249bccff98378278'});
 });
 
+socket.on('controlledBoat', function(data) {
+    console.log(data)
+    if(data.boat != boatSelected) return;
+    $('#motor_one').html(data.motion.leftEngine.toFixed(2));
+    $('#motor_two').html(data.motion.rightEngine.toFixed(2));
+    $('#rudder').html(data.motion.rudder.toFixed(2));
+})
 
 socket.on('authenticated', function (){
-    console.log('client authenticated!')
+    console.log('client authenticated!');
     socket.emit('getBoats');
 })
 
 socket.on('unauthorized', function (err) {
     console.log(err)
 })
+var dt = Date.now();
+
+socket.on('pong', function(data) {
+	console.log("received Pong:", data)
+	setUiPing(data.boat, data.ping);
+});
 
 socket.on('info', function(data) {
     if(data.id == boatSelected) {
@@ -69,6 +82,12 @@ $(document).ready(function() {
     });
 
 });
+
+function setUiPing(boatId, ping) {
+	var parent = $("input[value="+ boatId +"]").parent();
+	parent.find('span').remove()
+	$("<span>").html(getBoatById(boatId).name + " (" + ping + "ms)").appendTo(parent);
+}
 
 function getBoatById(id) {
     for(var i in boats) {

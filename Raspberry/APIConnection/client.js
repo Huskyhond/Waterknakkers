@@ -54,6 +54,7 @@ var authenticatedOnly = function () {
     setInterval(function () {
         if (queue.length > 0) {
             var data = queue.shift()
+	    data.timestamp = Date.now()
             socket.emit('info', data)
         }
     }, 100)
@@ -140,6 +141,7 @@ gpspy.on('message', function (message) {
             httpRequest(temperatureRequestOptions, function (data) {
                 initialize = false
                 temperature = data.main.temp
+		console.log('current outside temperature %s', temperature)
                 queue.push({outsideTemperature : temperature})
                 controllerpy.send(JSON.stringify([temperature]))
             })

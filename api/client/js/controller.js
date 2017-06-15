@@ -136,7 +136,7 @@ var configThree = {
 
 
 
-var controllerConfig = configOne;
+var controllerConfig = configThree;
 
 function updateStatus() {
     scangamepads();
@@ -155,9 +155,9 @@ function updateStatus() {
 }
 
 function setMotionInHtml(motion) {
-    $('#motor_one').html(motion.leftEngine);
-    $('#motor_two').html(motion.rightEngine);
-    $('#rudder').html(motion.rudder);
+    $('#motor_one').html(motion.leftEngine.toFixed(2));
+    $('#motor_two').html(motion.rightEngine.toFixed(2));
+    $('#rudder').html(motion.rudder.toFixed(2));
 }
 
 function scangamepads() {
