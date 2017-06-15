@@ -3,7 +3,7 @@
 
 HOST = "localhost"
 PORT = 4223
-UID = "suA" # Change XYZ to the UID of your GPS Bricklet
+UID = "suu" # Change XYZ to the UID of your GPS Bricklet
 import sys
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_gps import BrickletGPS
