@@ -95,8 +95,8 @@ class Api {
                 }) // put a valid token into the database
                 httpReponse(res, { token: _token }, 0) //send HTTP reponse to user with custom payload. 
             } else {
-                if (err) httpReponse(res, 0, err) // send the error in a json response if occured
-                httpReponse(res, 0, 'Invalid username or password')
+                if (err) httpReponse(res, { token: 0 }, err) // send the error in a json response if occured
+                httpReponse(res, { token: 0 }, 'Invalid username or password')
             }
         })
     }
