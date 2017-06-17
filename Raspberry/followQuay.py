@@ -9,14 +9,14 @@ import threading as th
 from time import sleep
 
 class Follow:
-    def __init__(self, callback, max_motorPower, sensorAngle = 45, debug = False):
+    def __init__(self, callback, max_motorPower, sensorAngle = 45, temperature = 20 debug = False):
         self.debug = debug                          # Boolean whether to print or not
         self.sensorAngle = sensorAngle              # Angle between sensor1 and sensor2
         self.max_motorPower = max_motorPower/100    # The max. motor power
         self.t = None                               # The thread to follow the quay wall
         self.running = False                        # Boolean to indicate the state of t 
         self.cb = callback                          # The callback that drives the boat
-        if isLinux: self.p = Ping()
+        if isLinux: self.p = Ping(temperature)
 
     def calcBoatAngle(self, sensorDistances):
         # Sensor1: the sensor perpendicular to the boat facing the quay wall
@@ -46,11 +46,11 @@ class Follow:
         angle2 = math.degrees(math.asin(((x*math.sin(math.radians(sensorAngle)))/wall)))
 
         if x > y:
-            angle3 = 180 - 45 - angle1
+            angle3 = 180 - self.sensorAngle - angle1
             return angle3
             #print(wall,angle3,angle1)
         else:
-            angle3 = 180 - 45 - angle2
+            angle3 = 180 - self.sensorAngle - angle2
             return angle3
             #print(wall,angle3,angle2)
 
@@ -77,7 +77,6 @@ class Follow:
         #boatAngle = self.calcBoatAngle([4,10]) 
         pings = self.getPings()
         boatAngle = self.calcAngle(pings) 
-        
         
         # Set the default motor power to max_motorPower
         motorL = motorR = self.max_motorPower
