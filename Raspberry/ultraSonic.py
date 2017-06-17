@@ -21,8 +21,7 @@ class Ping:
         self.temperature = temperature
         self.speedSound = 33100 + (0.6 * self.temperature)
 
-        print("Speed of sound is", self.speedSound /
-              100, "m/s at ", self.temperature, "deg")
+        print("Speed of sound is", self.speedSound / 100, "m/s at ", self.temperature, "deg")
 
         # Set pins as output and input
         GPIO.setup(self.GPIO_PINS[0][0], GPIO.OUT)  # Trigger

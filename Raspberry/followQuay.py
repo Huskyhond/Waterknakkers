@@ -9,7 +9,7 @@ import threading as th
 from time import sleep
 
 class Follow:
-    def __init__(self, callback, max_motorPower, sensorAngle = 45, temperature = 20 debug = False):
+    def __init__(self, callback, max_motorPower, sensorAngle = 45, temperature = 20, debug = False):
         self.debug = debug                          # Boolean whether to print or not
         self.sensorAngle = sensorAngle              # Angle between sensor1 and sensor2
         self.max_motorPower = max_motorPower/100    # The max. motor power
