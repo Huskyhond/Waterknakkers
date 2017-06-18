@@ -1,6 +1,4 @@
-Documentatie
-
-###API
+### API
 
 De API is de tussenlaag van de eindgebruiker en de boten. De boten kunnen worden bestuurd met API calls via WebSockets. Een gebruiker kan vanuit zijn WebBrowser commando’s sturen naar de API, de API stuurt de data dan door naar de gegeven boot.
 
@@ -22,6 +20,40 @@ Om de API-server te starten moet er in een terminal sessie het volgende worden g
 ``` 
 node app.js 
 ```
+
+**Veilige verbinding**
+
+Om te zorgen dat we Secure WebSockets hebben gebruiken we een reverse proxy in Nginx. De NodeJS server luistert op poort 3000. De nginx server verwijst naar de Node server en zet de secure connectie zelf op. Hiermee hebben we https over port 443.
+
+``` bash
+upstream NodeRunner {
+    server 127.0.0.1:3000;
+    keepalive 8;
+}
+
+server {
+    listen 443; 
+    server_name domain.com;
+    ssl_certificate /path/to/fullchain.pem
+    ssl_certificate_key /path/to/privkey.pem
+
+    location / {
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_cache_bypass $http_upgrade;
+        proxy_http_version 1.1;
+        proxy_pass NodeRunner;
+        proxy_redirect off;
+    }
+
+}
+
+```
+
 
 **Met de API communiceren**
 
@@ -73,14 +105,16 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
     ```JS
     {
         "error": 'example error message',
-        "payload": 0
+        "payload": {
+            "token": 0
+        }
     }
     ```
 *   ```authenticate``` - Deze functie neemt als parameter een token verkregen uit functie hierboven. Deze token moet meegestuurt worden zodra de gebruiker een connectie maakt met de WebSocket. Hieronder is een voorbeeld te zien in JavaScript.
 
     ```JS
     socket.on('connect', function(){
-        socket.emit('authentication', token)
+        socket.emit('authentication', authdata)
     })
     ```
     Als de token foutief of niet geldig blijkt te zijn zal de server een ```unautherized``` event sturen. Hierna zal de connectie direct worden verbroken.
@@ -89,4 +123,5 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
 
 *   ```postAuthenticate``` - Hierin staan de functies die aangeroepen kunnen worden nadat de client connected en authorized is.
 
+*   ```disconnect``` - Deze functie neemt als parameter de huidige socket connectie. Als een boot de WebSocket connectie verbreekt zal zijn token in de database ongeldig worden door middel van de ```api.logout``` functie. 
 

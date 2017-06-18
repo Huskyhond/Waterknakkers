@@ -7,7 +7,7 @@ print('Running boat Controller')
 c = Controller()
 
 followQuay = False
-f = Follow(c.driveBoat,60,45)
+f = Follow(c.driveBoat,60,45,20)
 
 print(json.dumps({'controllable': c.controllable, 'followQuay': f.running}))
 
@@ -26,6 +26,8 @@ while True:
 		# Put values in correct variables
 		if len(jsonObj) ==1:
 			temp = jsonObj[0]
+			if not f.running:
+				f = Follow(c.driveBoat,60,45,temp)
 			continue
 
 		engineLeft = jsonObj[0]
@@ -33,6 +35,7 @@ while True:
 		rudder = jsonObj[2]
 		if len(jsonObj) > 3:
 			followQuay = jsonObj[3]
+
 		# If controllable send data to arduino.
 		if c.controllable:
 			# Start following the quay wall

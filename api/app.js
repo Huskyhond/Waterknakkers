@@ -59,13 +59,12 @@ function postAuthenticate(socket, data) {
 
         socket.on('info', api.parseInformation)
 	
-	socket.on('pongBoat', api.boatPingsBack)
+	    socket.on('pongBoat', api.boatPingsBack)
     }
 }
 
 function disconnect(socket) {
     if (socket.isBoat) {
-        //TODO select on ID rather than on boatname
         api.logout(socket.username.toLowerCase())
         console.log('Boat disconnected: %s with id: %s', socket.name, socket.boatId)
     } else {
