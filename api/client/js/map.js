@@ -66,7 +66,7 @@ var sendCoordinatesButton = L.Control.extend({
 	
 	container.onclick = function(event) {
 		event.preventDefault();
-		console.log(navigationPath);
+		container.style['background-color'] = 'green';
 		socket.emit('controller', { boat: boatSelected, motion: { followCoords: true, goalLocation: navigationPath } });
 		navigationPath = [];
 		event.stopPropagation();
@@ -74,11 +74,39 @@ var sendCoordinatesButton = L.Control.extend({
 	}
 
     return container;
+  }
+
+});
+
+var followQuayButton = L.Control.extend({
+
+  options: {
+    position: 'topleft' 
+    //control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
   },
 
+  onAdd: function (map) {
+	var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom arrownav-container');
+	var i = document.createElement('i');
+	i.className = 'fa fa-ship arrownav';
+	container.appendChild(i);
+	container.setAttribute('title', 'Follow quay');
+	container.style.width = '30px';
+	container.style.height = '30px';
+	
+	container.onclick = function(event) {
+		event.preventDefault();
+		followQuay = !followQuay
+		socket.emit('controller', { boat: boatSelected, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: followQuay})
+		event.stopPropagation();
+		return false;
+	}
+
+    return container;
+  }
+
 });
+
 
 map.addControl(new sendCoordinatesButton());
-$(document).ready(function() {
-
-});
+map.addControl(new followQuayButton());
