@@ -44,12 +44,8 @@ var authenticatedOnly = function () {
             boatData.push(data.followCoords)
         // Dont bother the arduino if the delay between the sockets is too much.
         console.log('delay', delay, 'controllable', controllable)
-        //if(delay > 200 && controllable) {
-        controllerpy.send(JSON.stringify(boatData))
-        //}
-        //else {
-        //    controllerpy.send('')
-        //}
+        
+        controllerpy.send(JSON.stringify(data))
     })
 
     setInterval(function () {
@@ -152,7 +148,7 @@ gpspy.on('message', function (message) {
                 console.log('current outside temperature %s', temperature)
 
                 queue.push({ outsideTemperature: temperature })
-                controllerpy.send(JSON.stringify([temperature]))
+                controllerpy.send(JSON.stringify({ 'temperature' : temperature }))
             })
 
         }

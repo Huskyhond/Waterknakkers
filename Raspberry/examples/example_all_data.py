@@ -3,7 +3,7 @@
 
 HOST = "localhost"
 PORT = 4223
-UID = "XXYYZZ" # Change XXYYZZ to the UID of your IMU Brick 2.0
+UID = "62Bous" # Change XXYYZZ to the UID of your IMU Brick 2.0
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.brick_imu_v2 import BrickIMUV2
@@ -45,5 +45,5 @@ if __name__ == "__main__":
     # Set period for all data callback to 0.1s (100ms)
     imu.set_all_data_period(100)
 
-    raw_input("Press key to exit\n") # Use input() in Python 3
+    input("Press key to exit\n") # Use input() in Python 3
     ipcon.disconnect()

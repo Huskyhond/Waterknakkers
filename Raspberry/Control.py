@@ -20,13 +20,11 @@ class Controller:
             self.connected = False
             self.controllable = False
             
-
         print('Connected:',self.connected)
         self.motorL=90
         self.motorR=90
         self.rudderL=90
         self.rudderR=90
-        self.prev=0
 
     def write(self):
         """
@@ -35,55 +33,31 @@ class Controller:
         """
         #constructs a string to send to the arduino
         writeValues = 'a'+str(int(self.rudderL))+'b'+str(int(self.rudderR))+'c'+str(int(self.motorL))+'d'+str(int(self.motorR))+'z'
+        
         #send string to arduino
-        if self.debug: 
-            print('write:',writeValues)
+        if self.debug: print('write:',writeValues)
         self.ser.write(str.encode(writeValues))
+
         #wait 10 ms
         sleep(0.01)
-        #print the data that was send to the arduino
-        #print('Data naar arduino:', string)
-        # read and print the echo from the arduino
-        echo=self.ser.read(self.ser.inWaiting())
-        if self.debug: 
-            print('echo:',echo)
-        #print('Data van arduino terug:',echo)
-        # check is the echo is equal to the data send to the arduino
 
-        test=Literal('a')+Word(nums)+Literal('b')+Word(nums)+Literal('c')+Word(nums)+Literal('d')+Word(nums)+Literal('z')
+        # Read echo from the arduino
+        echo=self.ser.read(self.ser.inWaiting())
+        if self.debug: print('echo:',echo)
 
         try:
+            # Check if echo equals the writeValues
             if str.encode(writeValues) in echo:
-                if self.debug:
-                    print('Correct echo received')
+                if self.debug: print('Correct echo received')
                 return True
             else:
                 #no data received from arduino, or incorrect format
-                if self.debug: 
-                    print('Incorrect or empty echo from arduino received')
+                if self.debug: print('Incorrect or empty echo from arduino received')
                 self.controllable = False
                 return False
         except:
-            if self.debug:
-                print('Error comparing writeValues and echo.', 'writeValues:',str.encode(writeValues), 'echo:',echo)
+            if self.debug: print('Error comparing writeValues and echo.', 'writeValues:',str.encode(writeValues), 'echo:',echo)
             return False
-
-        '''
-        results=[int(antwoord[1]),int(antwoord[3]),int(antwoord[5]),int(antwoord[7])]
-        waardes=[int(self.rudderL),int(self.rudderR),int(self.motorL),int(self.motorR)]
-        
-        if (results==waardes):
-            #correct data received from arduino
-            if (self.prev!=results):
-                #print(results)
-                self.prev=results
-            return 1
-        else:
-            #data received from arduino was of correct format, but not correct values
-            if self.debug: 
-                print('Incorrect echo from arduino received')
-            return 0
-        '''
 
     def check(self):
         if self.driveBoat(0,0,0):
@@ -97,7 +71,10 @@ class Controller:
     def driveBoat(self, motorL, motorR, rudder):
         self.driveMotor(motorL,motorR)
         self.driveRudder(rudder)
-        return self.write()
+        if self.connected:
+            return self.write()
+        else:
+            print("Cannot write to boat")
 
     def driveMotor(self, motorL, motorR):
         tmp = motorL
@@ -113,7 +90,7 @@ class Controller:
 
 
     def driveRudder(self, angle):
-        angle = angle * -1
+        angle = angle * -1 # Reverse angle value
         angle = angle * 100
         angle = np.clip(angle, -100, 100) / 2
         self.rudderL = self.rudderR = 90 + angle
