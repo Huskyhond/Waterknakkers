@@ -5,7 +5,7 @@ var PythonShell = require('python-shell')
 var gpspy = new PythonShell('../GPS/get_gps.py')
 var controllerpy = new PythonShell('../boatController.py')
 
-var controllable, followQuay
+var controllable, followQuay, followCoords
 
 var temperature = undefined
 
@@ -21,7 +21,6 @@ var tokenRequestOptions = {
 var temperatureRequestOptions = {
     url: 'http://api.openweathermap.org/data/2.5/weather',
     method: 'GET',
-    //headers: { 'User-Agent': 'Waterknakker/0.0.1', 'Content-Type': 'application/x-www-form-urlencoded' },
     qs: { 'lat': undefined, 'lon': undefined, 'units': 'metric', 'APPID': '9977c05ce186bfe3c57ee3dbba5ef581' }
 }
 
@@ -37,10 +36,12 @@ var authenticatedOnly = function () {
         var now = Date.now()
         var delay = now - data.timestamp
         console.log("Delay in ms:", delay, data.timestamp, now)
-	console.log(data)
+        console.log(data)
         var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
-	if(data.followQuay === true || data.followQuay === false)
-		boatData.push(data.followQuay)
+        if (data.followQuay === true || data.followQuay === false)
+            boatData.push(data.followQuay)
+        if(data.followCoords === true || data.followCoords == false)
+            boatData.push(data.followCoords)
         // Dont bother the arduino if the delay between the sockets is too much.
         console.log('delay', delay, 'controllable', controllable)
         //if(delay > 200 && controllable) {
@@ -54,7 +55,7 @@ var authenticatedOnly = function () {
     setInterval(function () {
         if (queue.length > 0) {
             var data = queue.shift()
-	    data.timestamp = Date.now()
+            data.timestamp = Date.now()
             socket.emit('info', data)
         }
     }, 100)
@@ -113,6 +114,13 @@ controllerpy.on('message', function (message) {
             if (followQuay !== parse.followQuay) queue.push({ followQuay: parse.followQuay })
             followQuay = parse.followQuay
         }
+        if(parse.followCoords === true || parse.followCoords == false) {
+            if(followCoords !== parse.followCoords) queue.push({followCoords: parse.followQuay})
+            followCoords = parse.followCoords
+        }
+        
+        var scheepsbrugData = {ultrasonicSensorData: parse.sensorDistances, boatMotorRudderData: parse.driveValues}
+        socket.emit('info', scheepsbrugData)
     }
 })
 
@@ -141,18 +149,19 @@ gpspy.on('message', function (message) {
             httpRequest(temperatureRequestOptions, function (data) {
                 initialize = false
                 temperature = data.main.temp
-		console.log('current outside temperature %s', temperature)
-                queue.push({outsideTemperature : temperature})
+                console.log('current outside temperature %s', temperature)
+
+                queue.push({ outsideTemperature: temperature })
                 controllerpy.send(JSON.stringify([temperature]))
             })
 
         }
-        
+
         // Only push info is the GPS data is good.
-        if(lng > 0) {
+        if (lng > 0) {
             queue.push({ sensors: {}, location: [lat, lng] })
         }
-        
+
         latT = lngT = gpsIterations = 0
     }
 })
