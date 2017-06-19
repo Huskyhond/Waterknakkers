@@ -16,77 +16,51 @@ class Follow:
         self.t = None                               # The thread to follow the quay wall
         self.running = False                        # Boolean to indicate the state of t 
         self.cb = callback                          # The callback that drives the boat
-        if isLinux: self.p = Ping(temperature)
-
-    def calcBoatAngle(self, sensorDistances):
-        # Sensor1: the sensor perpendicular to the boat facing the quay wall
-        # Sensor2: the sensor facing the quay wall with an angle of <sensorAngle>
-        # Sensor3: the sensor perpendicular to the boat facing the front wall
-
-        # The desired distance sensor2 needs to parallel the boat to the quay wall
-        correctDistance = sensorDistances[0] / math.cos(self.sensorAngle)
-        # The difference between the measured distance from sensor2 and the correct distance
-        errorDistance = sensorDistances[1] - correctDistance
-        # The perpendicular distance between sensor1 and sensor2 from the quay wall
-        perpendicular = math.sqrt(math.pow(correctDistance,2) - math.pow(sensorDistances[0],2))
-        # The distance between sensor1 and sensor2
-        wallLength = math.sqrt(math.pow(errorDistance,2) + math.pow(perpendicular,2) -2 * errorDistance * perpendicular * math.cos(math.radians(180-self.sensorAngle)))
-        # The angle between the quay wall and perpendicular and the angle of the boat
-        angle = math.degrees(math.asin((errorDistance * math.sin(math.radians(180-self.sensorAngle)))/wallLength))
-        
-        #a = (errorDistance * math.sin(math.radians(180-self.sensorAngle)))
-        return angle
+        if isLinux: self.p = Ping(temperature)      # The Ping class to get ping sensor measurement
+        else: print("Ping sensors not initialized. OS is not Linux")
+        self.pings = [4,5.66,200]                   # The ping sensor measurement values
 
     def calcAngle(self, sensorDistances):
-        x = sensorDistances[0]
-        y = sensorDistances[1]
-        sensorAngle = self.sensorAngle
+        x = sensorDistances[0] # The distance from the boat to the Quay wall
+        y = sensorDistances[1] # The distance from the boat to the Quay wall with an 45 degrees angle
+        sensorAngle = self.sensorAngle # The angle between the 2 sensors facing the Quay wall
+        # Calculate angle between x and the wall
         wall = math.sqrt(math.pow(x,2) + math.pow(y,2) - 2*x*y*math.cos(math.radians(sensorAngle)))
-        angle1 = math.degrees(math.asin(((y*math.sin(math.radians(sensorAngle)))/wall)))
-        angle2 = math.degrees(math.asin(((x*math.sin(math.radians(sensorAngle)))/wall)))
-
         if x > y:
+            angle1 = math.degrees(math.asin(((y*math.sin(math.radians(sensorAngle)))/wall)))
             angle3 = 180 - self.sensorAngle - angle1
             return angle3
-            #print(wall,angle3,angle1)
         else:
+            angle2 = math.degrees(math.asin(((x*math.sin(math.radians(sensorAngle)))/wall)))
             angle3 = 180 - self.sensorAngle - angle2
             return angle3
-            #print(wall,angle3,angle2)
 
     def map(self, x, in_min, in_max, out_min, out_max):
         # Change incoming value in set range to value in other given range
-        # Round the output on 2 decimals and clips the output value between the out_min and out_max interval
-        x *= 100
-        in_min *= 100
-        in_max *= 100
-        out_min *= 100
-        out_max *= 100
+        # Clip the output value between the out_min and out_max interval
+        x, in_min, in_max, out_min, out_max = float(x), float(in_min), float(in_max), float(out_min), float(out_max)
         res = np.clip( ((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min) , out_min, out_max)
-
-        return float(res)/100
+        return float(res)
 
     def getPings(self):
-        if isLinux: pings = [self.p.measure(0),self.p.measure(1),self.p.measure(2)]
-        else: pings = [4,5.66]
-        if self.debug: print(pings)
-        return pings
+        # Set pings values to the ping sensors measurements
+        if isLinux: self.pings = [self.p.measure(0),self.p.measure(1),self.p.measure(2)]
+        # If the OS is not linux(raspberry pi), then return default values
+        else: self.pings = [4,5.66,200]
+        if self.debug: print(self.pings)
 
     def adjustBoat(self):
         # Calculate the angle of the boat using the ultrasonic sensors
-        #boatAngle = self.calcBoatAngle([4,10]) 
-        pings = self.getPings()
-        boatAngle = self.calcAngle(pings) 
-        
+        boatAngle = self.calcAngle(self.pings) 
         # Set the default motor power to max_motorPower
         motorL = motorR = self.max_motorPower
 
         print(boatAngle)
         # Steer boat to right when front wall in sight
-        if pings[2] < 30:
+        if self.pings[2] < 30:
             if self.debug: print("Front wall in sight, Steer Right")
-            motorL = 1
-            motorR = -1
+            motorL = 1 * self.max_motorPower
+            motorR = -1 * self.max_motorPower
             # Adjust rudder angle to counter steer the boat
             rudder = 1
 
@@ -106,13 +80,6 @@ class Follow:
             # Adjust rudder angle to counter steer the boat
             rudder = self.map(boatAngle, 65, 115, -1, 1)*-1
 
-        
-
-        #motorR = 100 + ((boatAngle / 90) * 100)
-        #motorL = (1 - (boatAngle / 90)) * 100
-        #motorL = round(self.max_motorPower * (motorL/100))
-        #motorR = round(self.max_motorPower * (motorR/100))
-
         if self.debug:
             print("Boat angle:", boatAngle)    
             print("MotorL:", motorL)
@@ -129,12 +96,13 @@ class Follow:
                 driveValues = self.adjustBoat()
                 self.cb(driveValues[0], driveValues[1], driveValues[2])
 
+
     def start(self):
         # Start thread to follow the quay wall
         if self.t is None and not self.running:
+            self.running = True
             self.t = th.Thread(target=self.follow)
             self.t.daemon = True
-            self.running = True
             self.t.start()
             print("Follow start")
         else:
