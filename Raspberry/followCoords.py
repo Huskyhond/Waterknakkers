@@ -12,6 +12,7 @@ import numpy as np
 import math
 import os
 
+#Debug values
 START_COORD = [53, 5]
 GOAL = [[53, 5], [54, 4], [54,6], [52,4], [52,6]]
 
@@ -172,7 +173,7 @@ class Coords():
         Calculate the differnce between goalAngle and the boatAngle \n
         This is needed to know when the boat has to sail and when the boat has to rotate
         """
-        data = self.imu.get_orientation()
+        data = self.imu.get_all_data()
         H, R, P = data.euler_angle
         self.boatAngle = round(H/16.0, 2)
         if(self.goalAngle is None):
