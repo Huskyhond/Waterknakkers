@@ -21,7 +21,7 @@ class IMU:
         self.ipcon = IPConnection()
         self.imu = BrickIMUV2(self.UID, self.ipcon)
 
-    def get_orientation(self):
+    def get_all_data(self):
         data = self.imu.get_all_data()
         return data
         
