@@ -12,18 +12,18 @@ import numpy as np
 import math
 import os
 
-# START_COORD = [53, 5]
-# GOAL = [[53, 5], [54, 4], [54,6], [52,4], [52,6]]
+START_COORD = [53, 5]
+GOAL = [[53, 5], [54, 4], [54,6], [52,4], [52,6]]
 
 class Coords():
+    """
+    This class performs GPS-to-GPS navigation with the Tinkerforge IMU v2.0 \n
+    :callback: Callback function that returns the driveValues of the boat \n
+    :max_power: The boat's max_power. \n 
+    :goal: Array of coordinates with the first input being the boat own coordinates \n
+    :debug: If debug is true, it will print most values. Default = False
+    """
     def __init__(self, callback, max_power, goal, debug = False):
-        """
-        This class performs GPS-to-GPS navigation with the Tinkerforge IMU v2.0
-        :param callback: Callback function that returns the driveValues of the boat
-        :param max_power: The boat's max_power.
-        :param goal: Array of coordinates with the first input being the boat own coordinates
-        :param debug: If debug is true, it will print most values. Default = False
-        """
         self.imu = IMU()
         self.connected = self.imu.connect()
         self.coordinates = [0,0]
@@ -39,16 +39,23 @@ class Coords():
         self.boatAngle = None
 
     def setPosition(self, coordinates):
+        """
+        Set the current boat's GPS location \n
+        :coordinates: [LONG,LAT]
+        """
         self.coordinates = coordinates                
 
     def setGoal(self, newGoal):
+        """
+        Sets the current GPS goal of the boat \n
+        :newGoal: [LONG,LAT]
+        """
         self.goal = newGoal
 
-    def setCoord(self, coord, number):
-        self.goal[number] = coord
-
     def map(self, x, in_min, in_max, out_min, out_max):
-        # Change a value in a range (like 50 in 0-100) to another range relative to the the number given (like 0 in -1 to 1)
+        """
+        Change a value in a range (like 50 in 0-100) to another range relative to the  given (like 0 in -1 to 1)
+        """
         x *= 100
         in_min *= 100
         in_max *= 100
@@ -57,9 +64,11 @@ class Coords():
         res = np.clip( ((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min) , out_min, out_max)
         return float(res)/100
 
-    # Calculate the Angle to boat has to rotate to in order to reach the goal.
-    # The calculation is based on a 360 circle and the goal being in range 1-360 with 360 being North
     def calcGoalAngle(self):
+        """    
+        Calculate the Angle to boat has to rotate to in order to reach the goal. \n
+        The calculation is based on a 360 circle and the goal being in range 1-360 with 360 being North
+        """
         dLng = self.goal[0] - self.coordinates[0]
         dLat = self.goal[1] - self.coordinates[1]
         goalAngle = 0
@@ -79,6 +88,9 @@ class Coords():
 
     # Function to rotate the boat
     def rotateBoat(self):
+        """
+        Rotate the boat
+        """
         motorL = motorR = rudder = 0
 
         clock = True
@@ -119,6 +131,9 @@ class Coords():
         return [motorL, motorR, rudder]
 
     def sailBoat(self, marge):
+        """
+        Sail the boat
+        """
         motorL = motorR = self.max_power
         rudder = 0
 
@@ -129,15 +144,16 @@ class Coords():
         
         # marge = abs(self.goalAngle - self.boatAngle) if abs(self.goalAngle - self.boatAngle) < 180 else 360 - abs(self.goalAngle - self.boatAngle)
 
-        if(self.debug):
-            if(self.coordinates[0] < self.goal[0]):
-                self.coordinates[0] = self.coordinates[0] + 0.1
-            else:
-                self.coordinates[0] = self.coordinates[0] - 0.1
-            if(self.coordinates[1] < self.goal[1]):
-                self.coordinates[1] = self.coordinates[1] + 0.1
-            else:
-                self.coordinates[1] = self.coordinates[1] - 0.1
+        # This code simulates the boat moving towards the next gps location.
+        # if(self.debug):
+        #     if(self.coordinates[0] < self.goal[0]):
+        #         self.coordinates[0] = self.coordinates[0] + 0.1
+        #     else:
+        #         self.coordinates[0] = self.coordinates[0] - 0.1
+        #     if(self.coordinates[1] < self.goal[1]):
+        #         self.coordinates[1] = self.coordinates[1] + 0.1
+        #     else:
+        #         self.coordinates[1] = self.coordinates[1] - 0.1
 
         if(self.debug):
             print("-----Piloting boat----")
@@ -152,6 +168,10 @@ class Coords():
         return [motorL, motorR, rudder]
 
     def calcMarge(self):
+        """
+        Calculate the differnce between goalAngle and the boatAngle \n
+        This is needed to know when the boat has to sail and when the boat has to rotate
+        """
         data = self.imu.get_orientation()
         H, R, P = data.euler_angle
         self.boatAngle = round(H/16.0, 2)
@@ -164,6 +184,9 @@ class Coords():
 
 # https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude/8674#8674
     def checkGoal(self, coordinates):
+        """
+        Calculate if the boat has reached his goal GPS
+        """
         Lng = self.coordinates[0]
         Lat = self.coordinates[1]
         goalLng = coordinates[0]
@@ -191,6 +214,10 @@ class Coords():
             return False
 
     def run(self):
+        """
+        Thread.run \n
+        This will run until the thread has been stopped
+        """
         # Keep adjusting the boat using the callback until running is set to false
         while self.running:
             if self.cb is not None:
@@ -214,16 +241,19 @@ class Coords():
                             if(self.debug):
                                 print("Destination reached")
                             self.stop()
-                    sleep(1)
+                    sleep(0.3)
                     self.cb(driveValues[0], driveValues[1], driveValues[2])
                 else:
                     self.cb(0,0,0)
             else:
                 print('cb is none')
-            sleep(1)
         print('running:', self.running)
 
     def start(self):
+        """
+        Thread.start \n
+        This will start the thread
+        """
         if self.t is None and not self.running:
             self.t = th.Thread(target=self.run)
             self.t.daemon = True
@@ -235,6 +265,10 @@ class Coords():
 
 
     def stop(self):
+        """
+        Thread.stop \n
+        This will stop the thread
+        """
         if self.t and self.running:
             self.running = False
             # self.t.join()
@@ -244,9 +278,15 @@ class Coords():
             if(self.debug): print("followCoords not running")
 
 def foo(x,y,z):
+    """
+    Testcallback
+    """
     pass
 
 def test():
+    """
+    Debug tester
+    """
     c = Coords(foo, 50, GOAL, debug = True)
     c.setPosition(START_COORD)
     c.start()
