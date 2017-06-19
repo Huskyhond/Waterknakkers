@@ -15,7 +15,8 @@ def driveBoat(leftEngine, rightEngine, rudder):
 max_power = 50
 
 followQuay = False
-fq = Follow(driveBoat,max_power,45,20) # driveBoat Callback, setsensorValues callback, max_power, sensorAngle, temperature, debug
+sensorAngle = 45
+fq = Follow(driveBoat,max_power,sensorAngle,20) # driveBoat Callback, setsensorValues callback, max_power, sensorAngle, temperature, debug
 
 followCoords = False
 goal = [51,60] # The goal coordinates
@@ -41,7 +42,7 @@ while True:
 		if len(jsonObj) == 1:
 			temp = jsonObj[0]
 			if not fq.running:
-				fq = Follow(driveBoat,60,45,temp)
+				fq = Follow(driveBoat,max_power,sensorAngle,temp)
 			continue
 
 		# Parse json data from web client
@@ -74,7 +75,7 @@ while True:
 		else:
 			# Checks if still uncontrollable.
 			c.check()
-			# Stop the follow quay wall thread if boat is not controllable
+			# Stop the follow quay wall or follow coords thread if boat is not controllable
 			if fq.running:
 				fq.stop()
 			if fc.running:

@@ -33,7 +33,7 @@ class Ping:
         GPIO.setup(self.GPIO_PINS[2][0], GPIO.OUT)  # Trigger
         GPIO.setup(self.GPIO_PINS[2][1], GPIO.IN)   # Echo
 
-        # Set triggers to False (Low)
+        # Set triggers to False (LOW)
         GPIO.output(self.GPIO_PINS[0][0], False)
         GPIO.output(self.GPIO_PINS[1][0], False)
         GPIO.output(self.GPIO_PINS[2][0], False)
@@ -45,20 +45,25 @@ class Ping:
         time.sleep(0.5)
 
     def measure(self, sensor):
-        # This function measures a distance
+        # Set trigger to True (HIGH)
         GPIO.output(self.GPIO_PINS[sensor][0], True)
         # Wait 10us
         time.sleep(0.00001)
+        # Set trigger to False (LOW)
         GPIO.output(self.GPIO_PINS[sensor][0], False)
         start = time.time()
 
+        # Wait for the echo pin to set to LOW
         while GPIO.input(self.GPIO_PINS[sensor][1]) == 0:
             start = time.time()
 
+        # Wait for the echo pin to set to HIGH
         while GPIO.input(self.GPIO_PINS[sensor][1]) == 1:
             stop = time.time()
 
+        # Calculate the difference in time
         elapsed = stop - start
+        # Calculate the measured distance
         distance = (elapsed * self.speedSound) / 2
 
         # Wait 20ms
