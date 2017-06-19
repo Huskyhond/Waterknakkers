@@ -46,3 +46,39 @@ var addMarker = function(event) {
 };
 
 map.on('click', addMarker);
+
+
+var sendCoordinatesButton = L.Control.extend({
+
+  options: {
+    position: 'topleft' 
+    //control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
+  },
+
+  onAdd: function (map) {
+	var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom arrownav-container');
+	var i = document.createElement('i');
+	i.className = 'fa fa-location-arrow arrownav';
+	container.appendChild(i);
+	container.setAttribute('title', 'Navigate path');
+	container.style.width = '30px';
+	container.style.height = '30px';
+	
+	container.onclick = function(event) {
+		event.preventDefault();
+		console.log(navigationPath);
+		socket.emit('controller', { boat: boatSelected, motion: { followCoords: true, goalLocation: navigationPath } });
+		navigationPath = [];
+		event.stopPropagation();
+		return false;
+	}
+
+    return container;
+  },
+
+});
+
+map.addControl(new sendCoordinatesButton());
+$(document).ready(function() {
+
+});

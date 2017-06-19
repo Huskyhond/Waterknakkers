@@ -133,3 +133,13 @@ time, mark, audio, video {
     overflow-y: scroll;
     width: 350px;
 }
+
+.arrownav-container {
+    cursor: pointer;
+    text-align: center;
+}
+
+.arrownav {
+    margin-top: 1px;
+    font-size: 25px;
+}
