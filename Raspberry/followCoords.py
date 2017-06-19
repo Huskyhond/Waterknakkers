@@ -183,9 +183,9 @@ class Coords():
             print("Marge: ", marge)
         return marge
 
-# https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude/8674#8674
     def checkGoal(self, coordinates):
         """
+        https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude/8674#8674
         Calculate if the boat has reached his goal GPS
         """
         Lng = self.coordinates[0]
@@ -241,7 +241,7 @@ class Coords():
                         elif(self.running):
                             if(self.debug):
                                 print("Destination reached")
-                            self.stop()
+                            self.cb(0,0,0)
                     sleep(0.3)
                     self.cb(driveValues[0], driveValues[1], driveValues[2])
                 else:
