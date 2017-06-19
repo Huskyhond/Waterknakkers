@@ -71,7 +71,10 @@ class Controller:
     def driveBoat(self, motorL, motorR, rudder):
         self.driveMotor(motorL,motorR)
         self.driveRudder(rudder)
-        return self.write()
+        if self.connected:
+            return self.write()
+        else:
+            print("Cannot write to boat")
 
     def driveMotor(self, motorL, motorR):
         tmp = motorL
