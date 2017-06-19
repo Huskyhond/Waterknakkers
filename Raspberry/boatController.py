@@ -91,7 +91,7 @@ while True:
 				quayHandle.updateQuayFollow(jsonObj['followQuay'], jsonObj['maxPower'])
 			
 			if 'followCoords' in jsonObj and not quayHandle.followQuay:
-				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], jsonObj['maxPower'], [jsonObj['goalLocationX'], jsonObj['goalLocationY']])
+				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], jsonObj['maxPower'], jsonObj['goalLocation'])
 			
 			if quayHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'sensorDistances' : quayHandle.instance.pings, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues}))
