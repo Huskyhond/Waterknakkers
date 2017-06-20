@@ -44,7 +44,7 @@ class Follow:
 
     def getPings(self):
         # Set pings values to the ping sensors measurements
-        if isLinux: self.pings = [self.p.measure(0),self.p.measure(1),self.p.measure(2)]
+        if isLinux: self.pings = [self.p.measure(2),self.p.measure(1),self.p.measure(0)]
         # If the OS is not linux(raspberry pi), then return default values
         else: self.pings = [4,5.66,200]
         if self.debug: print(self.pings)
