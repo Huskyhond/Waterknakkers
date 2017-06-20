@@ -133,12 +133,6 @@ var leftWidth = 360;
 $(document).ready(function() {
     $("#left").width(leftWidth);
     $("#right").width(viewport - leftWidth);
-    $('#startQuay').on('click', function() {
-	socket.emit('controller', { boat: boatSelected, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: true});
-    });
-    $('#stopQuay').on('click', function() {
-	socket.emit('controller', { boat: boatSelected, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: false});
-    });
 });
 
 $(window).resize(function() {

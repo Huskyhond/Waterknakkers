@@ -1,7 +1,12 @@
 'use strict';
 
 var _ = require('lodash')
-
+/**
+ * Force incoming WebSocket connections to authenticate before allowing them
+ * 
+ * @param {Object} - a socket.io server object
+ * @param {Object} - config parameters
+ */
 module.exports = function socketAuth(io, config) {
     config = config || {}
     var timeout = config.timeout || 1000
@@ -43,7 +48,7 @@ module.exports = function socketAuth(io, config) {
 
         if (timeout !== 'none') {
             setTimeout(function () {
-                // If the socket didn't authenticate after connection, disconnect it
+                // if the socket didn't authenticate after connecting, disconnect it after timeout seconds
                 if (!socket.auth) {
                     socket.disconnect('timeout')
                 }
@@ -52,7 +57,7 @@ module.exports = function socketAuth(io, config) {
     })
 }
 
-// Connections from unauthenticated sockets are not considered when emitting to the namespace. (Global emits)
+// connections from unauthenticated sockets are not considered when emitting to the namespace. (Global emits)
 function forbidConnections(nsp) {
     nsp.on('connect', function (socket) {
         if (!socket.auth) {

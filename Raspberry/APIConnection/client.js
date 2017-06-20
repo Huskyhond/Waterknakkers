@@ -32,20 +32,10 @@ var authenticatedOnly = function () {
     })
 
     socket.on('controller', function (data) {
-        //console.log(data)
-        var now = Date.now()
-        var delay = now - data.timestamp
-        console.log("Delay in ms:", delay, data.timestamp, now)
-        console.log(data)
-        var boatData = [data.motion.leftEngine, data.motion.rightEngine, data.motion.rudder]
-        if (data.followQuay === true || data.followQuay === false)
-            boatData.push(data.followQuay)
-        if(data.followCoords === true || data.followCoords == false)
-            boatData.push(data.followCoords)
-        // Dont bother the arduino if the delay between the sockets is too much.
-        console.log('delay', delay, 'controllable', controllable)
-        
-        controllerpy.send(JSON.stringify(data))
+	var toSend = data.motion;
+	if(data.followCoords) toSend.followCoords = data.followCoords
+	if(data.followQuay) toSend.followQuay = data.followQuay
+        controllerpy.send(JSON.stringify(toSend))
     })
 
     setInterval(function () {

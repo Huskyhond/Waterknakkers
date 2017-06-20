@@ -57,7 +57,6 @@ print('Running boat Controller')
 c = Controller()
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
-
 print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
 sys.stdout.flush()
@@ -75,7 +74,7 @@ while True:
 		jsonObj = json.loads(userinput)
 
 		# Put values in correct variables
-		if temperature in jsonObj:
+		if 'temperature'  in jsonObj:
 			temperature = jsonObj['temperature']
 
 			# Temperature will be given on initialization of the connection.
@@ -91,7 +90,7 @@ while True:
 				quayHandle.updateQuayFollow(jsonObj['followQuay'], jsonObj['maxPower'])
 			
 			if 'followCoords' in jsonObj and not quayHandle.followQuay:
-				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], jsonObj['maxPower'], [jsonObj['goalLocationX'], jsonObj['goalLocationY']])
+				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], jsonObj['maxPower'], jsonObj['goalLocation'])
 			
 			if quayHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'sensorDistances' : quayHandle.instance.pings, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues}))
