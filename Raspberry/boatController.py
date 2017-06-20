@@ -73,6 +73,10 @@ while True:
 		# Parse to python json object (list)
 		jsonObj = json.loads(userinput)
 
+		if 'currentLocation' in jsonObj:
+			coordsHandle.instance.setPosition(jsonObj['currentLocation'])
+			continue
+
 		# Put values in correct variables
 		if 'temperature'  in jsonObj:
 			temperature = jsonObj['temperature']

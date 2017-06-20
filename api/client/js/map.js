@@ -1,5 +1,6 @@
 var markers = [];
 var navigationPath = [];
+var oldNavigationPath = [];
 var followingCoords = false;
 function addToMap(latLngArr) {
 	console.log('Adding marker', latLngArr)
@@ -28,6 +29,11 @@ function setStartPosition(marker, boatName) {
 
 var addMarker = function(event) {
 	// If it is already navigating to a different marker, remove that one first.
+	for(var i =0 ; i < oldNavigationPath.length; i++) {
+		map.removeLayer(oldNavigationPath[i]);
+	}
+	oldNavigationPath = [];
+
 	if(navigationPath.length < 1) {
     	setStartPosition(event);
 	}
@@ -78,6 +84,7 @@ var sendCoordinatesButton = L.Control.extend({
 		    container.style['background-color'] = 'white';
 		    socket.emit('controller', { boat: boatSelected, maxPower: 50, motion: { followCoords: false, goalLocation: [] } });
 		}
+		oldNavigationPath = navigationPath;
 		navigationPath = [];
 		event.stopPropagation();
 		return false;
