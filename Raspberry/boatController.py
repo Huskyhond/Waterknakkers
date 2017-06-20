@@ -10,7 +10,7 @@ class QuayHandle:
 		self.followQuay = followQuay
 		self.controller = controller
 		self.temperature = 20
-		self.instance = Follow(driveBoat, 50, 45, self.temperature, True) # Callback, max_power, sensorAngle, temperature
+		self.instance = Follow(driveBoat, 50, 45, self.temperature, True) # Callback, max_power, sensorAngle, temperature, debug
 	
 	def setTemperature(self, temperature):
 		self.temperature = temperature
@@ -18,8 +18,6 @@ class QuayHandle:
 	def updateQuayFollow(self, newFollowQuay, maxPower):
 		if newFollowQuay is self.followQuay:
 			return
-		#elif newFollowQuay:
-		#	self.instance = Follow(driveBoat, maxPower, 45, self.temperature, True)	
 		
 		self.followQuay = newFollowQuay
 		if self.followQuay:

@@ -3,14 +3,13 @@ isLinux = False
 if "Linux" in platform.system():
     from ultraSonic import Ping
     isLinux = True
-    print(platform.system())
 import math
 import numpy as np
 import threading as th
 from time import sleep
 
 class Follow:
-    def __init__(self, callback, max_motorPower, sensorAngle = 45, temperature = 20, debug = False):
+    def __init__(self, callback, max_motorPower, sensorAngle = 45, temperature = 20, debug):
         self.debug = debug                          # Boolean whether to print or not
         self.sensorAngle = sensorAngle              # Angle between sensor1 and sensor2
         self.max_motorPower = max_motorPower/100    # The max. motor power
@@ -51,44 +50,50 @@ class Follow:
         # If the OS is not linux(raspberry pi), then return default values
         else: self.pings = [4,5.66,200]
 
-    def adjustBoat2(self, setQuayDistance):
-        self.getPings()
-        quayWallDistance = self.pings[0]
-        frontWallDistance = self.pings[2]
-        motorL = motorR = rudder = 0
+    def adjustBoat2(self):
+        quayWallDistance = self.p.measure(2)
+        frontWallDistance = self.p.measure(0)
+
+        # Idle motors if sensors timeout
+        if quayWallDistance is 0 or frontWallDistance is 0:
+            return [0,0,0]
+
+        motorL = motorR = rudder = 0.0
         power = 0.5
+        setQuayDistance = 50
+        deadZone = 15
 
         # Front wall in sight, steer right
         if frontWallDistance < 250:
-            if self.debug:
-                print("Front wall, Steer Right")
-                print("Sensor Distances:",[quayWallDistance,frontWallDistance])
-                print("MotorL:", motorL, "MotorR:", motorR, "Rudder:", rudder)
+            if self.debug: print("Front wall, Steer Right")
             motorL = power
             motorR = -power
-            rudder = 1
-            return [motorL, motorR, rudder] 
-
+            rudder = 1.0
         # Steer left
-        if quayWallDistance > setQuayDistance:
+        elif quayWallDistance > setQuayDistance+deadZone:
             if self.debug: print("Steer Left")
-            motorL = 0.05
+            motorL = 0.0
             motorR = power
             rudder = -0.7
         # Steer right
-        else:
+        elif quayWallDistance < setQuayDistance-deadZone:
             if self.debug: print("Steer Right")
             motorL = power
-            motorR= 0.05
+            motorR= 0.0
             rudder = 0.7
+        # Go straight if in deadzone
+        else:
+            motorL = power
+            motorR = power
+            rudder = 0
 
         if self.debug:
             print("Sensor Distances:",[quayWallDistance,frontWallDistance])
-            print("MotorL:", motorL, "MotorR:", motorR, "Rudder:", rudder)
+            print("Drive:", motorL, motorR, rudder)
 
         return [motorL, motorR, rudder] 
 
-
+    '''
     def adjustBoat(self):
         self.getPings()
         # Calculate the angle of the boat using the ultrasonic sensors
@@ -129,12 +134,13 @@ class Follow:
 
         # Return the motor power and the rudder angle
         return [motorL,motorR,rudder]
+    '''
 
     def follow(self):
         # Keep adjusting the boat using the callback until running is set to false
         while self.running:
             if self.cb is not None:
-                driveValues = self.adjustBoat2(50)
+                driveValues = self.adjustBoat2()
                 self.cb(driveValues[0], driveValues[1], driveValues[2])
                 sleep(0.3)
 

@@ -60,6 +60,9 @@ class Ping:
         # Wait for the echo pin to set to HIGH
         while GPIO.input(self.GPIO_PINS[sensor][1]) == 1:
             stop = time.time()
+            # Timeout after 0.2s
+            if stop > 0.2:
+                return 0
 
         # Calculate the difference in time
         elapsed = stop - start
