@@ -29,11 +29,7 @@ class Coords():
         self.connected = self.imu.connect()
         self.goalNumber = 1
         self.totalGoal = goal
-<<<<<<< HEAD
         self.goal = self.totalGoal[self.goalNumber]
-=======
-        self.goal = self.totalGoal[self.goa+lNumber]
->>>>>>> 78f14daee5cb37e38e68996126953cfc6f9c6c5d
         self.coordinates = self.totalGoal[0]
         self.max_power = max_power/100
         self.debug = debug
