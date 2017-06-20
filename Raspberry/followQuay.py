@@ -3,6 +3,7 @@ isLinux = False
 if "Linux" in platform.system():
     from ultraSonic import Ping
     isLinux = True
+    print(platform.system())
 import math
 import numpy as np
 import threading as th
@@ -16,7 +17,9 @@ class Follow:
         self.t = None                               # The thread to follow the quay wall
         self.running = False                        # Boolean to indicate the state of t 
         self.cb = callback                          # The callback that drives the boat
-        if isLinux: self.p = Ping(temperature)      # The Ping class to get ping sensor measurement
+        if isLinux: 
+            self.p = Ping(temperature)      # The Ping class to get ping sensor measurement
+            print("Ping sensors initialized!")
         else: print("Ping sensors not initialized. OS is not Linux")
         self.pings = [4,5.66,200]                   # The ping sensor measurement values
 
@@ -47,17 +50,49 @@ class Follow:
         if isLinux: self.pings = [self.p.measure(2),self.p.measure(1),self.p.measure(0)]
         # If the OS is not linux(raspberry pi), then return default values
         else: self.pings = [4,5.66,200]
-        if self.debug: print(self.pings)
+
+    def adjustBoat2(self, setQuayDistance):
+        self.getPings()
+        quayWallDistance = self.pings[0]
+        frontWallDistance = self.pings[2]
+        motorL = motorR = rudder = 0
+
+        # Front wall in sight, steer right
+        if frontWallDistance < 250:
+            if self.debug: print("Front wall, Steer Right")
+            motorL = 0.15
+            motorR = -0.15
+            rudder = 1
+
+        # Steer left
+        if quayWallDistance > setQuayDistance:
+            if self.debug: print("Steer Left")
+            motorL = 0.05
+            motorR = 0.15
+            rudder = -1
+        # Steer right
+        else:
+            if self.debug: print("Steer Right")
+            motorL = 0.15
+            motorR= 0.05
+            rudder = 1
+
+        if self.debug:
+            print("Sensor Distances:",[quayWallDistance,frontWallDistance])
+            print("MotorL:", motorL, "MotorR:", motorR, "Rudder:", rudder)
+
+        return [motorL, motorR, rudder] 
+
 
     def adjustBoat(self):
+        self.getPings()
         # Calculate the angle of the boat using the ultrasonic sensors
         boatAngle = self.calcAngle(self.pings) 
         # Set the default motor power to max_motorPower
         motorL = motorR = self.max_motorPower
 
-        print(boatAngle)
         # Steer boat to right when front wall in sight
-        if self.pings[2] < 30:
+        if self.pings[2] < 200:
             if self.debug: print("Front wall in sight, Steer Right")
             motorL = 1 * self.max_motorPower
             motorR = -1 * self.max_motorPower
@@ -81,6 +116,7 @@ class Follow:
             rudder = self.map(boatAngle, 65, 115, -1, 1)*-1
 
         if self.debug:
+            print("Pings:", self.pings)
             print("Boat angle:", boatAngle)    
             print("MotorL:", motorL)
             print("MotorR:", motorR)
@@ -93,7 +129,7 @@ class Follow:
         # Keep adjusting the boat using the callback until running is set to false
         while self.running:
             if self.cb is not None:
-                driveValues = self.adjustBoat()
+                driveValues = self.adjustBoat2(100)
                 self.cb(driveValues[0], driveValues[1], driveValues[2])
 
 
