@@ -24,8 +24,6 @@ class Ping:
         self.temperature = temperature
         self.speedSound = 33100 + (0.6 * self.temperature)
 
-        print("Speed of sound is", self.speedSound / 100, "m/s at ", self.temperature, "deg")
-
         # Set pins as output and input
         GPIO.setup(self.GPIO_PINS[0][0], GPIO.OUT)  # Trigger
         GPIO.setup(self.GPIO_PINS[0][1], GPIO.IN)   # Echo
@@ -46,6 +44,12 @@ class Ping:
 
         # Allow module to settle
         time.sleep(0.5)
+
+    def setTemperature(self,temperature):
+        self.temperature = temperature
+        self.speedSound = 33100 + (0.6 * self.temperature)
+        print("Speed of sound is", self.speedSound / 100, "m/s at ", self.temperature, "deg")
+
 
     def measure(self, sensor):
         # Set trigger to True (HIGH)

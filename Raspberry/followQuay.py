@@ -19,7 +19,9 @@ class Follow:
         if isLinux: 
             self.p = Ping(temperature)              # The Ping class to get ping sensor measurement
             print("Ping sensors initialized!")
-        else: print("Ping sensors not initialized. OS is not Linux")
+        else: 
+            self.p = None
+            print("Ping sensors not initialized. OS is not Linux")
         self.pings = [4,5.66,200]                   # The ping sensor measurement values
 
     def calcAngle(self, sensorDistances):
