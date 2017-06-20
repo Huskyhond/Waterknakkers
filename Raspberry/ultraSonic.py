@@ -9,7 +9,10 @@ def exit_handler():
 
 
 class Ping:
-    def __init__(self, temperature=20):
+    def __init__(self, temperature=20, smoothingRange = 20):
+        self.smoothingRange = smoothingRange
+        self.prevValues = []
+        self.spikeValues = []
         # Use BCM GPIO references, instead of physical pin numbers
         GPIO.setmode(GPIO.BCM)
 
@@ -67,11 +70,31 @@ class Ping:
         # Calculate the difference in time
         elapsed = stop - start
         # Calculate the measured distance
-        distance = (elapsed * self.speedSound) / 2
-
+        distance = self.smoothDistance((elapsed * self.speedSound) / 2)
         # Wait 20ms
         time.sleep(0.02)
         return distance
+
+    def smoothDistance(self, distance):
+        if len(self.prevValues) > 0 and abs(distance-self.prevValues[len(self.prevValues)-1]) > self.smoothingRange:
+            self.spikeValues.append(distance)
+            if len(self.spikeValues) is spikeSize:
+                self.prevValues += self.spikeValues[:spikeSize-1]
+                #print(self.spikeValues)
+                for pV in self.prevValues:
+                    if len(self.prevValues) is bufferSize-1: break
+                    else: self.prevValues.pop(0)
+                self.spikeValues = []
+            else:
+                continue
+        else:
+            self.spikeValues = []
+            
+        self.prevValues.append(distance)
+        if len(self.prevValues) is bufferSize+1:
+            self.prevValues.pop(0)
+        #print(distance,self.prevValues,sum(self.prevValues)/len(self.prevValues))
+        return sum(self.prevValues)/len(self.prevValues)
 
 def test():
     p = Ping()

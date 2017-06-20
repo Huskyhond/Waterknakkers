@@ -17,7 +17,7 @@ class Follow:
         self.running = False                        # Boolean to indicate the state of t 
         self.cb = callback                          # The callback that drives the boat
         if isLinux: 
-            self.p = Ping(temperature)      # The Ping class to get ping sensor measurement
+            self.p = Ping(temperature)              # The Ping class to get ping sensor measurement
             print("Ping sensors initialized!")
         else: print("Ping sensors not initialized. OS is not Linux")
         self.pings = [4,5.66,200]                   # The ping sensor measurement values
@@ -174,7 +174,7 @@ def foo(x,y,z):
 def test():
     f = Follow(foo, 100, debug = True)
     f.start()
-    sleep(60)
+    sleep(120)
     f.stop()
 
 
