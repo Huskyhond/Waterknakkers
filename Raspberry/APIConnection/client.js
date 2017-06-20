@@ -37,6 +37,7 @@ var authenticatedOnly = function () {
 	if(data.followQuay !== undefined) toSend.followQuay = data.followQuay
 	if(data.maxPower !== undefined) toSend.maxPower = data.maxPower 
         controllerpy.send(JSON.stringify(toSend))
+        console.log(toSend)
     })
 
     setInterval(function () {
