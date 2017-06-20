@@ -27,10 +27,10 @@ class Coords():
     def __init__(self, callback, max_power, goal, debug = False):
         self.imu = IMU()
         self.connected = self.imu.connect()
-        self.coordinates = self.totalGoal[0]
         self.goalNumber = 1
         self.totalGoal = goal
-        self.goal = self.totalGoal[self.goalNumber]
+        self.goal = self.totalGoal[self.goa+lNumber]
+        self.coordinates = self.totalGoal[0]
         self.max_power = max_power/100
         self.debug = debug
         self.t = None
