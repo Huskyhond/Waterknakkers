@@ -32,7 +32,10 @@ var authenticatedOnly = function () {
     })
 
     socket.on('controller', function (data) {
-        controllerpy.send(JSON.stringify(data.motion))
+	var toSend = data.motion;
+	if(data.followCoords) toSend.followCoords = data.followCoords
+	if(data.followQuay) toSend.followQuay = data.followQuay
+        controllerpy.send(JSON.stringify(toSend))
     })
 
     setInterval(function () {

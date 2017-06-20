@@ -1,5 +1,6 @@
 var markers = [];
 var navigationPath = [];
+var followingCoords = false;
 function addToMap(latLngArr) {
 	console.log('Adding marker', latLngArr)
 	if(markers.length > 0) {
@@ -66,8 +67,17 @@ var sendCoordinatesButton = L.Control.extend({
 	
 	container.onclick = function(event) {
 		event.preventDefault();
-		container.style['background-color'] = 'green';
-		socket.emit('controller', { boat: boatSelected, motion: { followCoords: true, goalLocation: navigationPath } });
+		followingCoords = !followingCoords;
+		var navCoords = navigationPath.map(function(marker) { return [marker._latlng.lat, marker._latlng.lng] });
+		if(followingCoords) {
+		    container.style['background-color'] = 'green';
+		    console.log('Emitting the following:',  { boat: boatSelected, motion: { followCoords: true, goalLocation: navCoords } })
+		    socket.emit('controller', { boat: boatSelected, motion: { followCoords: true, goalLocation: navCoords } });
+		}
+		else {
+		    container.style['background-color'] = 'white';
+		    socket.emit('controller', { boat: boatSelected, motion: { followCoords: false, goalLocation: navigationPath } });
+		}
 		navigationPath = [];
 		event.stopPropagation();
 		return false;
@@ -97,6 +107,13 @@ var followQuayButton = L.Control.extend({
 	container.onclick = function(event) {
 		event.preventDefault();
 		followQuay = !followQuay
+		if(followQuay) {
+			container.style['background-color'] = 'green';
+		}
+		else {
+			container.style['background-color'] = 'white';
+		}
+		
 		socket.emit('controller', { boat: boatSelected, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: followQuay})
 		event.stopPropagation();
 		return false;

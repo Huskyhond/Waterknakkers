@@ -54,7 +54,7 @@ class Api {
 
     onMotion(data) {
         data = instance.formatInput(data)
-        console.log('Sending data to boat: ' + data.boat)
+        console.log('Sending data to boat: ' + data)
         var socket = instance.getConnection(data.boat)
         if (socket) {
             data.timestamp = Date.now()
