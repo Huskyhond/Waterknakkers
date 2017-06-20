@@ -10,7 +10,7 @@ class QuayHandle:
 		self.followQuay = followQuay
 		self.controller = controller
 		self.temperature = 20
-		self.instance = Follow(driveBoat, 50, 45, self.temperature) # Callback, max_power, sensorAngle, temperature
+		self.instance = Follow(driveBoat, 50, 45, self.temperature, True) # Callback, max_power, sensorAngle, temperature
 	
 	def setTemperature(self, temperature):
 		self.temperature = temperature
@@ -18,8 +18,8 @@ class QuayHandle:
 	def updateQuayFollow(self, newFollowQuay, maxPower):
 		if newFollowQuay is self.followQuay:
 			return
-		elif newFollowQuay:
-			self.instance = Follow(driveBoat, maxPower, 45, self.temperature, True)	
+		#elif newFollowQuay:
+		#	self.instance = Follow(driveBoat, maxPower, 45, self.temperature, True)	
 		
 		self.followQuay = newFollowQuay
 		if self.followQuay:
@@ -94,7 +94,7 @@ while True:
 				quayHandle.updateQuayFollow(jsonObj['followQuay'], 15)
 			
 			if 'followCoords' in jsonObj and not quayHandle.followQuay:
-				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], jsonObj['maxPower'], jsonObj['goalLocation'])
+				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], 15, jsonObj['goalLocation'])
 			
 			if quayHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'sensorDistances' : quayHandle.instance.pings, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues}))

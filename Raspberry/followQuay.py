@@ -56,26 +56,31 @@ class Follow:
         quayWallDistance = self.pings[0]
         frontWallDistance = self.pings[2]
         motorL = motorR = rudder = 0
+        power = 0.5
 
         # Front wall in sight, steer right
         if frontWallDistance < 250:
-            if self.debug: print("Front wall, Steer Right")
-            motorL = 0.15
-            motorR = -0.15
+            if self.debug:
+                print("Front wall, Steer Right")
+                print("Sensor Distances:",[quayWallDistance,frontWallDistance])
+                print("MotorL:", motorL, "MotorR:", motorR, "Rudder:", rudder)
+            motorL = power
+            motorR = -power
             rudder = 1
+            return [motorL, motorR, rudder] 
 
         # Steer left
         if quayWallDistance > setQuayDistance:
             if self.debug: print("Steer Left")
             motorL = 0.05
-            motorR = 0.15
-            rudder = -1
+            motorR = power
+            rudder = -0.7
         # Steer right
         else:
             if self.debug: print("Steer Right")
-            motorL = 0.15
+            motorL = power
             motorR= 0.05
-            rudder = 1
+            rudder = 0.7
 
         if self.debug:
             print("Sensor Distances:",[quayWallDistance,frontWallDistance])
@@ -92,7 +97,7 @@ class Follow:
         motorL = motorR = self.max_motorPower
 
         # Steer boat to right when front wall in sight
-        if self.pings[2] < 200:
+        if self.pings[2] < 150:
             if self.debug: print("Front wall in sight, Steer Right")
             motorL = 1 * self.max_motorPower
             motorR = -1 * self.max_motorPower
@@ -129,8 +134,9 @@ class Follow:
         # Keep adjusting the boat using the callback until running is set to false
         while self.running:
             if self.cb is not None:
-                driveValues = self.adjustBoat2(100)
+                driveValues = self.adjustBoat2(50)
                 self.cb(driveValues[0], driveValues[1], driveValues[2])
+                sleep(0.3)
 
 
     def start(self):
