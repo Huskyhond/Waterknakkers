@@ -21,13 +21,13 @@ class Coords():
     This class performs GPS-to-GPS navigation with the Tinkerforge IMU v2.0 \n
     :callback: Callback function that returns the driveValues of the boat \n
     :max_power: The boat's max_power. \n 
-    :goal: Array of coordinates with the first input being the boat own coordinates \n
+    :goal: Array of coordinates with the first input being the boat's own coordinates \n
     :debug: If debug is true, it will print most values. Default = False
     """
     def __init__(self, callback, max_power, goal, debug = False):
         self.imu = IMU()
         self.connected = self.imu.connect()
-        self.coordinates = [0,0]
+        self.coordinates = self.totalGoal[0]
         self.goalNumber = 1
         self.totalGoal = goal
         self.goal = self.totalGoal[self.goalNumber]
@@ -68,7 +68,7 @@ class Coords():
     def calcGoalAngle(self):
         """    
         Calculate the Angle to boat has to rotate to in order to reach the goal. \n
-        The calculation is based on a 360 circle and the goal being in range 1-360 with 360 being North
+        The calculation is based on a 360 circle and the goal being in range 0-360 with 0 being North
         """
         dLng = self.goal[0] - self.coordinates[0]
         dLat = self.goal[1] - self.coordinates[1]
@@ -128,7 +128,7 @@ class Coords():
             print("MotorR:", motorR)
             print("Rudder: ", rudder)
             print("GOAL: ", self.goal)
-            print("Coordinates: ", self.coordinates)
+            print("Boat Coordinates: ", self.coordinates)
         return [motorL, motorR, rudder]
 
     def sailBoat(self, marge):
@@ -157,6 +157,7 @@ class Coords():
         #         self.coordinates[1] = self.coordinates[1] - 0.1
 
         if(self.debug):
+            print("Going forward")
             print("-----Piloting boat----")
             print("Goal Angle: ", self.goalAngle)
             print("Boat angle:", self.boatAngle) 
@@ -165,7 +166,7 @@ class Coords():
             print("Rudder: ", rudder)
             print("Max power: ", self.max_power)
             print("GOAL: ", self.goal)
-            print("Coordinates: ", self.coordinates)
+            print("Boat Coordinates: ", self.coordinates)
         return [motorL, motorR, rudder]
 
     def calcMarge(self):
