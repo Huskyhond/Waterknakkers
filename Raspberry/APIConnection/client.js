@@ -33,9 +33,9 @@ var authenticatedOnly = function () {
 
     socket.on('controller', function (data) {
 	var toSend = data.motion;
-	if(data.followCoords) toSend.followCoords = data.followCoords
-	if(data.followQuay) toSend.followQuay = data.followQuay
-	if(data.maxPower) toSend.maxPower = data.maxPower 
+	if(data.followCoords !== undefined) toSend.followCoords = data.followCoords
+	if(data.followQuay !== undefined) toSend.followQuay = data.followQuay
+	if(data.maxPower !== undefined) toSend.maxPower = data.maxPower 
         controllerpy.send(JSON.stringify(toSend))
     })
 
