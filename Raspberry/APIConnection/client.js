@@ -35,6 +35,7 @@ var authenticatedOnly = function () {
 	var toSend = data.motion;
 	if(data.followCoords) toSend.followCoords = data.followCoords
 	if(data.followQuay) toSend.followQuay = data.followQuay
+	if(data.maxPower) toSend.maxPower = data.maxPower 
         controllerpy.send(JSON.stringify(toSend))
     })
 
