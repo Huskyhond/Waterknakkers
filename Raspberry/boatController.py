@@ -57,7 +57,6 @@ print('Running boat Controller')
 c = Controller()
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
-
 print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
 sys.stdout.flush()
@@ -75,7 +74,7 @@ while True:
 		jsonObj = json.loads(userinput)
 
 		# Put values in correct variables
-		if temperature in jsonObj:
+		if 'temperature'  in jsonObj:
 			temperature = jsonObj['temperature']
 
 			# Temperature will be given on initialization of the connection.
