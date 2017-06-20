@@ -27,10 +27,10 @@ class Coords():
     def __init__(self, callback, max_power, goal, debug = False):
         self.imu = IMU()
         self.connected = self.imu.connect()
-        self.coordinates = self.totalGoal[0]
         self.goalNumber = 1
         self.totalGoal = goal
         self.goal = self.totalGoal[self.goalNumber]
+        self.coordinates = self.totalGoal[0]
         self.max_power = max_power/100
         self.debug = debug
         self.t = None
@@ -273,8 +273,8 @@ class Coords():
         """
         if self.t and self.running:
             self.running = False
-            # self.t.join()
-            self.t = None
+            self.t.join()
+            # self.t = None
             if(self.debug): print("followCoords stop")
         else:
             if(self.debug): print("followCoords not running")

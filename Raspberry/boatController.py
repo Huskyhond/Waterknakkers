@@ -18,8 +18,8 @@ class QuayHandle:
 	def updateQuayFollow(self, newFollowQuay, maxPower):
 		if newFollowQuay is self.followQuay:
 			return
-		else:
-			self.instance = Follow(driveBoat, maxPower, 45, self.temperature)	
+		elif newFollowQuay:
+			self.instance = Follow(driveBoat, maxPower, 45, self.temperature, True)	
 		
 		self.followQuay = newFollowQuay
 		if self.followQuay:
@@ -37,11 +37,11 @@ class CoordsHandle:
 	def updateCoordsFollow(self, newFollowCoords, max_power, goal):
 		if newFollowCoords is self.followCoords:
 			return
-		else:
+		elif newFollowCoords and len(goal)>1:
 			self.instance = Coords(driveBoat, max_power, goal, False)
 
 		self.followCoords = newFollowCoords
-		if self.followCoords:
+		if self.followCoords and len(goal)>1:
 			self.instance.start()
 		else:
 			self.instance.stop()
@@ -87,7 +87,7 @@ while True:
 		if c.controllable:
 			# Start following the quay wall
 			if 'followQuay' in jsonObj and not coordsHandle.followCoords:
-				quayHandle.updateQuayFollow(jsonObj['followQuay'], jsonObj['maxPower'])
+				quayHandle.updateQuayFollow(jsonObj['followQuay'], 15)
 			
 			if 'followCoords' in jsonObj and not quayHandle.followQuay:
 				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], jsonObj['maxPower'], jsonObj['goalLocation'])
@@ -110,11 +110,11 @@ while True:
 			c.check()
 			# Stop the follow quay wall thread if boat is not controllable
 			if quayHandle.instance.running:
-				quayHandle.updateQuayFollow(False)
+				quayHandle.updateQuayFollow(False, 0)
 
 			# Stop the follow coords wall thread if boat is not controllable
 			if coordsHandle.instance.running:
-				coordsHandle.updateCoordsFollow(False)
+				coordsHandle.updateCoordsFollow(False,0,[])
 
 		print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
