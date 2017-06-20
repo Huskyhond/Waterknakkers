@@ -72,11 +72,11 @@ var sendCoordinatesButton = L.Control.extend({
 		if(followingCoords) {
 		    container.style['background-color'] = 'green';
 		    console.log('Emitting the following:',  { boat: boatSelected, motion: { followCoords: true, goalLocation: navCoords } })
-		    socket.emit('controller', { boat: boatSelected, motion: { followCoords: true, goalLocation: navCoords } });
+		    socket.emit('controller', { boat: boatSelected, maxPower: 50, motion: { followCoords: true, goalLocation: navCoords } });
 		}
 		else {
 		    container.style['background-color'] = 'white';
-		    socket.emit('controller', { boat: boatSelected, motion: { followCoords: false, goalLocation: navigationPath } });
+		    socket.emit('controller', { boat: boatSelected, maxPower: 50, motion: { followCoords: false, goalLocation: [] } });
 		}
 		navigationPath = [];
 		event.stopPropagation();
@@ -114,7 +114,7 @@ var followQuayButton = L.Control.extend({
 			container.style['background-color'] = 'white';
 		}
 		
-		socket.emit('controller', { boat: boatSelected, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: followQuay})
+		socket.emit('controller', { boat: boatSelected, maxPower: 50, motion: { leftEngine: 0, rightEngine: 0, rudder: 0 }, followQuay: followQuay})
 		event.stopPropagation();
 		return false;
 	}

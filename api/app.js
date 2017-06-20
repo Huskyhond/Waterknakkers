@@ -65,7 +65,7 @@ function postAuthenticate(socket, data) {
 
 function disconnect(socket) {
     if (socket.isBoat) {
-        api.logout(socket.username.toLowerCase())
+        //api.logout(socket.username.toLowerCase())
         console.log('Boat disconnected: %s with id: %s', socket.name, socket.boatId)
     } else {
         console.log('client disconnected')
