@@ -50,12 +50,16 @@ def driveBoat(leftEngine, rightEngine, rudder):
 	driveValues = [leftEngine, rightEngine, rudder]
 	c.driveBoat(leftEngine, rightEngine, rudder)
 
+oldControllable = oldFollowQuay = oldFollowCoords = False
+
 
 print('Running boat Controller')
 c = Controller()
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
 print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
+oldControllable = c.controllable
+
 
 sys.stdout.flush()
 while True:
@@ -88,7 +92,7 @@ while True:
 			print('reloop3')
 			sys.stdout.flush()
 			continue
-
+	
 		# If controllable send data to arduino.
 		if c.controllable:
 			# Start following the quay wall
@@ -96,7 +100,7 @@ while True:
 				quayHandle.updateQuayFollow(jsonObj['followQuay'], 15)
 			
 			if 'followCoords' in jsonObj and not quayHandle.followQuay:
-				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], 15, jsonObj['goalLocation'])
+				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], 50, jsonObj['goalLocation'])
 			
 			if quayHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'sensorDistances' : quayHandle.instance.pings, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues}))
@@ -116,6 +120,7 @@ while True:
 			if 'leftEngine' in jsonObj and 'rightEngine' in jsonObj and 'rudder' in jsonObj:
 				c.driveBoat(jsonObj['leftEngine'], jsonObj['rightEngine'], jsonObj['rudder'])
 		else:
+			print('Uncontrollable!')
 			# Checks if still uncontrollable.
 			c.check()
 			# Stop the follow quay wall thread if boat is not controllable
@@ -127,5 +132,9 @@ while True:
 				coordsHandle.updateCoordsFollow(False,0,[])
 				print('Coords is stopping')
 				
-	print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
+	if c.controllable is not oldControllable or quayHandle.instance.running is not oldFollowQuay or coordsHandle.instance.running is not oldFollowCoords:
+		oldControllable = c.controllable
+		oldFollowQuay = quayHandle.instance.running
+		oldFollowCoords = coordsHandle.instance.running
+		print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 	sys.stdout.flush()
