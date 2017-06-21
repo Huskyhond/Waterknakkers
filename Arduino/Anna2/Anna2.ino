@@ -164,18 +164,18 @@ void rpi()
       RechterMotor.write(RM);
 
       //the program then echoes the received commands back to the sender over serial interface
-      if(debug)
-      {
-        Serial.print('a');
-        Serial.print(LR);
-        Serial.print('b');
-        Serial.print(RR);
-        Serial.print('c');  
-        Serial.print(LM);
-        Serial.print('d');  
-        Serial.print(RM);
-        Serial.print('z');   
-      }
+      
+      
+      Serial.print('a');
+      Serial.print(LR);
+      Serial.print('b');
+      Serial.print(RR);
+      Serial.print('c');  
+      Serial.print(LM);
+      Serial.print('d');  
+      Serial.print(RM);
+      Serial.print('z');   
+      
       
     }
     else
