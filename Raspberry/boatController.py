@@ -52,13 +52,12 @@ def driveBoat(leftEngine, rightEngine, rudder):
 
 oldControllable = oldFollowQuay = oldFollowCoords = False
 
-
 print('Running boat Controller')
 c = Controller()
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
-print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 oldControllable = c.controllable
+print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
 
 sys.stdout.flush()
