@@ -37,7 +37,7 @@ var authenticatedOnly = function () {
 	if(data.followQuay !== undefined) toSend.followQuay = data.followQuay
 	if(data.maxPower !== undefined) toSend.maxPower = data.maxPower 
         controllerpy.send(JSON.stringify(toSend))
-        console.log(toSend)
+        console.log('Sending the following to the Python script:', toSend)
     })
 
     setInterval(function () {
@@ -87,6 +87,7 @@ function httpRequest(options, callback) {
 socket.on('pingBoat', function() { socket.emit('pongBoat') })
 
 controllerpy.on('message', function (message) {
+    console.log(message)
     var parse = undefined;
     try {
         parse = JSON.parse(message);
