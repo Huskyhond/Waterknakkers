@@ -84,7 +84,7 @@ class Follow:
             motorL = 0.0
             motorR = power
             #rudder = -0.7
-            rudder -= (abs(setQuayDistance - quayWallDistance)*0.3)/100
+            rudder -= (abs(setQuayDistance - quayWallDistance)*0.25)/100
             rudder = np.clip(rudder, -1,0)
         # Steer right
         elif quayWallDistance < setQuayDistance-deadZone:
@@ -92,7 +92,7 @@ class Follow:
             motorL = power
             motorR=  0.0
             #rudder = 0.7
-            rudder += (abs(setQuayDistance - quayWallDistance)*0.3)/100
+            rudder += (abs(setQuayDistance - quayWallDistance)*0.25)/100
             rudder = np.clip(rudder, 0,1)
         # Go straight if in deadzone
         else:

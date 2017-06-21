@@ -159,9 +159,9 @@ class Coords():
         rudder = 0
 
         if(marge > 10):
-            motorR = self.map(marge, 0, 20, 0, 1)
+            motorR = self.map(marge, 0, 20, 0, self.max_power)
         elif(marge <= 10):
-            motorL = self.map(marge, 0, 20, 0, 1)
+            motorL = self.map(marge, 0, 20, 0, self.max_power)
         
         # marge = abs(self.goalAngle - self.boatAngle) if abs(self.goalAngle - self.boatAngle) < 180 else 360 - abs(self.goalAngle - self.boatAngle)
 
@@ -313,7 +313,7 @@ def test():
     """
     Debug tester
     """
-    c = Coords(foo, 50, GOAL, True, Calibration.NORTHOFFSET)
+    c = Coords(foo, 50, GOAL, True)
     c.setPosition(START_COORD)
     c.start()
     while c.running:

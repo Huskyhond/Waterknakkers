@@ -87,7 +87,9 @@ function httpRequest(options, callback) {
 socket.on('pingBoat', function() { socket.emit('pongBoat') })
 
 controllerpy.on('message', function (message) {
+    console.log('-------------- PYTHON -------------')
     console.log(message)
+    console.log('-------------- END PYTHON -------------')
     var parse = undefined;
     try {
         parse = JSON.parse(message);
@@ -97,8 +99,7 @@ controllerpy.on('message', function (message) {
     }
     if (parse) {
         if (parse.controllable === true || parse.controllable === false) {
-            controllable = parse.controllable
-            console.log('setting controllable to', controllable)
+            controllable = parse.controllable     
         }
         if (parse.followQuay === true || parse.followQuay === false) {
             if (followQuay !== parse.followQuay) queue.push({ followQuay: parse.followQuay })
@@ -110,7 +111,6 @@ controllerpy.on('message', function (message) {
         }
         
         var scheepsbrugData = {controllable: controllable, followQuay: followQuay, followCoords: followCoords, ultrasonicSensorData: parse.sensorDistances, boatMotorRudderData: parse.driveValues}
-        console.log(scheepsbrugData)
         queue.push(scheepsbrugData)
     }
 })

@@ -75,6 +75,7 @@ class Controller:
             return self.write()
         else:
             print("Cannot write to boat")
+            self.controllable = False
 
     def driveMotor(self, motorL, motorR):
         tmp = motorL
