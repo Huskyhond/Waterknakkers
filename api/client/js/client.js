@@ -44,6 +44,7 @@ socket.on('info', function(data) {
 socket.on('getBoats', function(boatsin) {
     for(var i in boatsin.boats) {
         boats.push(boatsin.boats[i]);
+	setFollowStates(boatsin.boats[i]);
     }
     updateBoats();
 });
@@ -121,8 +122,8 @@ function updateBoats() {
             boatSelected = boats[i].id;
         }
 
-        $("<span>").html(" " + boat).appendTo(div);
-        var controllable = (boats[i].controllable) ? 'fa fa-check-circle' : 'fa-times-circle';
+        $("<span>").html(" " + boat + " ").appendTo(div);
+        var controllable = (boats[i].controllable) ? 'fa fa-check-circle' : 'fa fa-times-circle';
         $("<i>").addClass(controllable).appendTo(div);
         div.appendTo(parent);
     }

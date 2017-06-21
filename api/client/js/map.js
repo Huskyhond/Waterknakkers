@@ -2,6 +2,20 @@ var markers = [];
 var navigationPath = [];
 var oldNavigationPath = [];
 var followingCoords = false;
+
+function setFollowStates(boat) {
+  if(boat.followQuay !== undefined) {
+	var color = (boat.followQuay) ? 'green' : 'white';
+	$('.followQuay').css('background-color', color);
+	followQuay = boats.followQuay;
+  }
+  if(boat.followCoords !== undefined) {
+	var color = (boat.followCoords) ? 'green' : 'white';
+	$('.followCoords').css('background-color', color);
+	followCoords = boats.followCoords;
+  }
+}
+
 function addToMap(latLngArr) {
 	console.log('Adding marker', latLngArr)
 	if(markers.length > 0) {
@@ -63,7 +77,7 @@ var sendCoordinatesButton = L.Control.extend({
   },
 
   onAdd: function (map) {
-	var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom arrownav-container');
+	var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom arrownav-container followCoords');
 	var i = document.createElement('i');
 	i.className = 'fa fa-location-arrow arrownav';
 	container.appendChild(i);
@@ -103,7 +117,7 @@ var followQuayButton = L.Control.extend({
   },
 
   onAdd: function (map) {
-	var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom arrownav-container');
+	var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom arrownav-container followQuay');
 	var i = document.createElement('i');
 	i.className = 'fa fa-ship arrownav';
 	container.appendChild(i);
