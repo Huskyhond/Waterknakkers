@@ -28,6 +28,7 @@ class Follow:
         x = sensorDistances[0] # The distance from the boat to the Quay wall
         y = sensorDistances[1] # The distance from the boat to the Quay wall with an 45 degrees angle
         sensorAngle = self.sensorAngle # The angle between the 2 sensors facing the Quay wall
+        
         # Calculate angle between x and the wall
         wall = math.sqrt(math.pow(x,2) + math.pow(y,2) - 2*x*y*math.cos(math.radians(sensorAngle)))
         if x > y:
@@ -52,6 +53,7 @@ class Follow:
         # If the OS is not linux(raspberry pi), then return default values
         else: self.pings = [4,5.66,200]
 
+    # Using only 1 sensor
     def adjustBoat2(self):
         quayWallDistance = self.p.measure(2)
         frontWallDistance = self.p.measure(0)
@@ -85,8 +87,7 @@ class Follow:
             rudder = 0.7
         # Go straight if in deadzone
         else:
-            motorL = power
-            motorR = power
+            motorL = motorR = power
             rudder = 0
 
         if self.debug:
@@ -95,7 +96,52 @@ class Follow:
 
         return [motorL, motorR, rudder] 
 
+    # Using 2 sensors with both 30 degrees angle
+    def adjustBoat3(self):
+        quayWallDistance1 = self.p.measure(2) # L
+        quayWallDistance2 = self.p.measure(1) # R
+        frontWallDistance = self.p.measure(0) 
+
+        # Idle motors if sensors timeout
+        if quayWallDistance1 is 0 or quayWallDistance2 is 0 or frontWallDistance is 0:
+            return [0,0,0]
+
+        motorL = motorR = rudder = 0.0
+        power = 0.5
+        setQuayDistance = 50
+        deadZone = 30
+
+        # Front wall in sight, steer right
+        if frontWallDistance < 200:
+            if self.debug: print("Front wall, Steer Right")
+            motorL = power
+            motorR = -power
+            rudder = 1.0
+        # Sensors in deadzone
+        elif abs(quayWallDistance2 - quayWallDistance1) <= deadZone:
+            if self.debug: print("In deadzone, Go Straight")
+            motorL = motorR = power
+            rudder = 0
+        # Steer left
+        elif quayWallDistance1 <= quayWallDistance2:
+            if self.debug: print("Steer Left")
+            motorL = 0.0
+            motorR = power
+            rudder = -0.8
+        # Steer right
+        elif quayWallDistance2 < quayWallDistance1:
+            if self.debug: print("Steer Right")
+            motorL = power
+            motorR= 0.0
+            rudder = 0.8
+
+        if self.debug:
+            print("Sensor Distances:", [quayWallDistance, frontWallDistance], "Drive:", motorL, motorR, rudder)
+
+        return [motorL, motorR, rudder] 
+
     '''
+    # Using 2 sensors with perpendicular and 45 degrees
     def adjustBoat(self):
         self.getPings()
         # Calculate the angle of the boat using the ultrasonic sensors
@@ -142,7 +188,9 @@ class Follow:
         # Keep adjusting the boat using the callback until running is set to false
         while self.running:
             if self.cb is not None:
+                #driveValues = self.adjustBoat()
                 driveValues = self.adjustBoat2()
+                #driveValues = self.adjustBoat3()
                 self.cb(driveValues[0], driveValues[1], driveValues[2])
                 sleep(0.3)
 
