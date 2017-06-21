@@ -9,7 +9,7 @@ class QuayHandle:
 	def __init__(self, controller, followQuay = False):
 		self.followQuay = followQuay
 		self.controller = controller
-		self.instance = Follow(driveBoat, 50, 45, 20, True) # Callback, max_power, sensorAngle, temperature, debug
+		self.instance = Follow(driveBoat, 50, 45, 20, False) # Callback, max_power, sensorAngle, temperature, debug
 	
 	def setTemperature(self, temperature):
 		if self.instance.p is not None:
@@ -63,9 +63,12 @@ while True:
 	userinput = sys.stdin.readline()
 	if(not c.connected):
 		c = Controller()
+		print(json.dumps({'controllable': c.controllable}))
 		sleep(0.5)
+		print('reloop1')
+		sys.stdout.flush()
 		continue
-
+	
 	# If the length is more than 1, NodeJS Pushes an empty string time to time and also one character time to time.
 	if(len(userinput) > 1):
 		# Parse to python json object (list)
@@ -73,7 +76,6 @@ while True:
 
 		if 'currentLocation' in jsonObj:
 			coordsHandle.instance.setPosition(jsonObj['currentLocation'])
-			continue
 
 		# Put values in correct variables
 		if 'temperature'  in jsonObj:
@@ -83,6 +85,8 @@ while True:
 			if not quayHandle.instance.running:
 				# Update Quay follower instance
 				quayHandle.setTemperature(temperature)
+			print('reloop3')
+			sys.stdout.flush()
 			continue
 
 		# If controllable send data to arduino.
@@ -96,10 +100,14 @@ while True:
 			
 			if quayHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'sensorDistances' : quayHandle.instance.pings, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues}))
+				print('reloop4')
+				sys.stdout.flush()
 				continue
 
 			if coordsHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues }))
+				print('reloop5')
+				sys.stdout.flush()
 				continue
 
 			
@@ -113,11 +121,11 @@ while True:
 			# Stop the follow quay wall thread if boat is not controllable
 			if quayHandle.instance.running:
 				quayHandle.updateQuayFollow(False, 0)
-
+				print('Quay is stopping')
 			# Stop the follow coords wall thread if boat is not controllable
 			if coordsHandle.instance.running:
 				coordsHandle.updateCoordsFollow(False,0,[])
-
-		print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
-
+				print('Coords is stopping')
+				
+	print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 	sys.stdout.flush()

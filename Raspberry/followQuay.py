@@ -9,7 +9,7 @@ import threading as th
 from time import sleep
 
 class Follow:
-    def __init__(self, callback, max_motorPower, sensorAngle = 45, temperature = 20, debug):
+    def __init__(self, callback, max_motorPower, sensorAngle = 45, temperature = 20, debug=False):
         self.debug = debug                          # Boolean whether to print or not
         self.sensorAngle = sensorAngle              # Angle between sensor1 and sensor2
         self.max_motorPower = max_motorPower/100    # The max. motor power
@@ -60,36 +60,45 @@ class Follow:
 
         # Idle motors if sensors timeout
         if quayWallDistance is 0 or frontWallDistance is 0:
+            print("return [0]")
             return [0,0,0]
 
         motorL = motorR = rudder = 0.0
-        power = 0.5
-        setQuayDistance = 50
-        deadZone = 15
+        power = 0.25
+        setQuayDistance = 70
+        deadZone = 5
 
+        #if frontWallDistance < 275:
+         #   motorL = motorR = -power
+          #  rudder = 1
         # Front wall in sight, steer right
         if frontWallDistance < 250:
             if self.debug: print("Front wall, Steer Right")
-            motorL = power
-            motorR = -power
-            rudder = 1.0
+            motorL = 0.5
+            motorR = -0.5
+            rudder = 1
+
         # Steer left
         elif quayWallDistance > setQuayDistance+deadZone:
             if self.debug: print("Steer Left")
             motorL = 0.0
             motorR = power
-            rudder = -0.7
+            #rudder = -0.7
+            rudder -= (abs(setQuayDistance - quayWallDistance)*0.3)/100
+            rudder = np.clip(rudder, -1,0)
         # Steer right
         elif quayWallDistance < setQuayDistance-deadZone:
             if self.debug: print("Steer Right")
             motorL = power
-            motorR= 0.0
-            rudder = 0.7
+            motorR=  0.0
+            #rudder = 0.7
+            rudder += (abs(setQuayDistance - quayWallDistance)*0.3)/100
+            rudder = np.clip(rudder, 0,1)
         # Go straight if in deadzone
         else:
             motorL = motorR = power
             rudder = 0
-
+        
         if self.debug:
             print("Sensor Distances:",[quayWallDistance,frontWallDistance])
             print("Drive:", motorL, motorR, rudder)
@@ -108,7 +117,7 @@ class Follow:
 
         motorL = motorR = rudder = 0.0
         power = 0.5
-        setQuayDistance = 50
+        setQuayDistance = 100
         deadZone = 30
 
         # Front wall in sight, steer right
@@ -135,8 +144,8 @@ class Follow:
             motorR= 0.0
             rudder = 0.8
 
-        if self.debug:
-            print("Sensor Distances:", [quayWallDistance, frontWallDistance], "Drive:", motorL, motorR, rudder)
+        #if self.debug:
+        print("Sensor Distances:", [quayWallDistance, frontWallDistance], "Drive:", motorL, motorR, rudder)
 
         return [motorL, motorR, rudder] 
 
@@ -224,7 +233,7 @@ def foo(x,y,z):
 def test():
     f = Follow(foo, 100, debug = True)
     f.start()
-    sleep(120)
+    sleep(400)
     f.stop()
 
 

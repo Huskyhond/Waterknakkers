@@ -11,10 +11,18 @@ from time import sleep
 import numpy as np
 import math
 import os
+from enum import Enum
 
 #Debug values
-START_COORD = [53, 5]
-GOAL = [[53, 5], [54, 4], [54,6], [52,4], [52,6]]
+#START_COORD = [53, 5]
+#GOAL = [[53, 5], [54, 4], [54,6], [52,4], [52,6]]
+
+#Actual testvalues
+START_COORD = [51.89797260202735, 4.419135396892671]
+GOAL = [[51.89797260202735, 4.419135396892671],[51.89811825005212, 4.422289674694185]]
+
+class Calibration(Enum):
+    NORTHOFFSET = 1
 
 class Coords():
     """
@@ -24,7 +32,7 @@ class Coords():
     :goal: Array of coordinates with the first input being the boat's own coordinates \n
     :debug: If debug is true, it will print most values. Default = False
     """
-    def __init__(self, callback, max_power, goal, debug = False):
+    def __init__(self, callback, max_power, goal, debug = False, calibration = None):
         self.imu = IMU()
         self.connected = self.imu.connect()
         self.goalNumber = 1
@@ -38,6 +46,8 @@ class Coords():
         self.cb = callback
         self.goalAngle = None
         self.boatAngle = None
+        self.boatNorthOffset = 0
+        self.calibration = calibration
 
     def setPosition(self, coordinates):
         """
@@ -64,6 +74,16 @@ class Coords():
         out_max *= 100
         res = np.clip( ((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min) , out_min, out_max)
         return float(res)/100
+
+    def calcNorthOffset(self):
+        """
+        In order to counter faulty hardware, the boat will always be facing north the first time it runs a script.
+        This will calculate the offset from the real North with the north given by the IMU.
+        """
+        data = self.imu.get_all_data()
+        H, R, F = data.euler_angle
+        self.boatAngle = round(H/16.0, 2)
+        self.boatNorthOffset = 360 - self.boatAngle
 
     def calcGoalAngle(self):
         """    
@@ -176,7 +196,10 @@ class Coords():
         """
         data = self.imu.get_all_data()
         H, R, P = data.euler_angle
-        self.boatAngle = round(H/16.0, 2)
+        if(self.calibration != None and self.calibration == 1):
+            self.boatAngle = round(H/16.0, 2) + self.boatNorthOffset
+        else:
+            self.boatAngle = round(H/16.0, 2)
         if(self.goalAngle is None):
             self.goalAngle = self.calcGoalAngle()
         marge = abs(self.goalAngle - self.boatAngle) if abs(self.goalAngle - self.boatAngle) < 180 else 360 - abs(self.goalAngle - self.boatAngle)
@@ -221,6 +244,7 @@ class Coords():
         This will run until the thread has been stopped
         """
         # Keep adjusting the boat using the callback until running is set to false
+        self.calcNorthOffset()
         while self.running:
             if self.cb is not None:
                 if(self.connected):
@@ -289,10 +313,10 @@ def test():
     """
     Debug tester
     """
-    c = Coords(foo, 50, GOAL, debug = True)
+    c = Coords(foo, 50, GOAL, True, Calibration.NORTHOFFSET)
     c.setPosition(START_COORD)
     c.start()
     while c.running:
         pass
 
-# test()
+#test()

@@ -78,6 +78,43 @@ Je kan in de io als eerste parameter ook een ip en poort opgeven als de client n
 *	```boatDisconnected``` – Als er een boot geen internet meer heeft.
 *	```getBoats``` – Ontvang alle verbonden boten van de server. (eerst emitten)
 *	```controller``` – Ontvang de motor en rudder informatie (Je kan deze alleen ontvangen als je je als boot geauthentiseerd hebt.
+*   ```info``` - 
+
+**Controller**
+Om de kade te volgen kan je ```controller``` emitten naar de server. Een voorbeeld hiervan is hieronder te zien:
+```javascript
+{
+    boat: 'boatId',
+    motion: {
+        followQuay: true
+    }
+}
+```
+Om een coordinaat of een set coordinaten te volgen, waarbij de eerste coordinaat je huidige positie is. (De boot overschrijft deze waarde als ze ook GPS heeft.)
+```javascript
+{
+    boat: 'boatId',
+    motion: {
+        followCoords: true,
+        goalLocation: [
+            [51.89841130000001,4.4187506999999995], // Startpositie
+            [51.75915515414,4.4132131250001], // Evt tussenstop
+            [51.98109515,4.984129085901] // Eindbestemming
+        ]
+    }
+}
+```
+Directe motion commando's sturen:
+```javascript
+{
+    boat: 'boatId',
+    motion: {
+        'leftEngine': 0 // Waarde tussen -1 en 1
+        'rightEngine': 0,
+        'rudder': 0
+    }
+}
+```
 
 **Authenticatie**
 

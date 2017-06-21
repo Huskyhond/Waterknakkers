@@ -4,7 +4,7 @@ var socket = io();
 
 
 socket.on('connect', function(){
-    socket.emit('authentication', {token : '918d87a8171860a8e5181a0f249bccff98378278'});
+   socket.emit('authentication', {token : '918d87a8171860a8e5181a0f249bccff98378278'});
 });
 
 socket.on('controlledBoat', function(data) {
@@ -35,15 +35,26 @@ socket.on('info', function(data) {
         $('#console').append('<div>' + JSON.stringify(data.info) + '</div>');
     }
     
-    if(data.info && data.info.location) {
-        addToMap(data.info.location)
-        setStartPosition(data.info.location, getBoatById(data.id).name)
+    if(data.info) {
+	    if(data.info.location) {
+		addToMap(data.info.location)
+		setStartPosition(data.info.location, getBoatById(data.id).name)
+	    }
+	    console.log(data.info);
+	    if(data.info.controllable === true) {
+		$('.controllable-state').removeClass('fa-ban').addClass('fa-check-circle');
+	    }
+            else if(data.info.controllable !== undefined && data.info.controllable === false) {
+		$('.controllable-state').removeClass('fa-check-circle').addClass('fa-ban');
+	    }
     }
+    
 })
 
 socket.on('getBoats', function(boatsin) {
     for(var i in boatsin.boats) {
         boats.push(boatsin.boats[i]);
+	setFollowStates(boatsin.boats[i]);
     }
     updateBoats();
 });
@@ -85,8 +96,8 @@ $(document).ready(function() {
 
 function setUiPing(boatId, ping) {
 	var parent = $("input[value="+ boatId +"]").parent();
-	parent.find('span').remove()
-	$("<span>").html(getBoatById(boatId).name + " (" + ping + "ms)").appendTo(parent);
+	parent.find('.ping').remove();
+	$("<span>").addClass('ping').html(" (" + ping + "ms)").appendTo(parent);
 }
 
 function getBoatById(id) {
@@ -121,7 +132,9 @@ function updateBoats() {
             boatSelected = boats[i].id;
         }
 
-        $("<span>").html(" " + boat).appendTo(div);
+        $("<span>").html(" " + boat + " ").appendTo(div);
+        var controllable = (boats[i].controllable) ? 'fa fa-check-circle controllable-state' : 'fa fa-ban controllable-state';
+        $("<i>").addClass(controllable).appendTo(div);
         div.appendTo(parent);
     }
 }
