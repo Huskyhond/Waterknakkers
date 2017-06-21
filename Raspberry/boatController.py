@@ -30,7 +30,7 @@ class CoordsHandle:
 	def __init__(self, controller, followCoords = False):
 		self.followCoords = followCoords
 		self.controller = controller
-		self.instance = Coords(driveBoat,50,[50,55],True) # Callback, max_power, goal, debug
+		self.instance = Coords(driveBoat,50,[50,55],False) # Callback, max_power, goal, debug
 	
 	def updateCoordsFollow(self, newFollowCoords, max_power, goal):
 		if newFollowCoords is self.followCoords:
