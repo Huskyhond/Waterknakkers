@@ -141,7 +141,12 @@ time, mark, audio, video {
 
 .arrownav {
     margin-top: 1px;
-    font-size: 22px;
+    font-size: 50px;
+}
+
+.followQuay .arrownav {
+    margin-top: 5px;
+    font-size: 45px;
 }
 
 .connected_box i {
