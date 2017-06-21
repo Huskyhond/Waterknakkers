@@ -84,6 +84,8 @@ function httpRequest(options, callback) {
     })
 }
 
+socket.on('pingBoat', function() { socket.emit('pongBoat') })
+
 controllerpy.on('message', function (message) {
     console.log(message)
     var parse = undefined;
@@ -107,8 +109,8 @@ controllerpy.on('message', function (message) {
             followCoords = parse.followCoords
         }
         
-        var scheepsbrugData = {ultrasonicSensorData: parse.sensorDistances, boatMotorRudderData: parse.driveValues}
-        socket.emit('info', scheepsbrugData)
+        var scheepsbrugData = {controllable: controllable, followQuay: followQuay, followCoords: followCoords, ultrasonicSensorData: parse.sensorDistances, boatMotorRudderData: parse.driveValues}
+        queue.push(scheepsbrugData)
     }
 })
 
@@ -145,7 +147,7 @@ gpspy.on('message', function (message) {
 
         }
 
-        // Only push info is the GPS data is good.
+        // Only push info if the GPS data is good.
         if (lng > 0) {
             controllerpy.send(JSON.stringify({ currentLocation: [lat, lng] }))
             queue.push({ sensors: {}, location: [lat, lng] })
