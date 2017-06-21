@@ -61,8 +61,6 @@ sys.stdout.flush()
 while True:
 	# Wait for input from NodeJS
 	userinput = sys.stdin.readline()
-	print('ik ben gvd gewoon connected')
-	print(c.connected)
 	if(not c.connected):
 		c = Controller()
 		print(json.dumps({'controllable': c.controllable}))

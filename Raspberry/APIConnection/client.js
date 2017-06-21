@@ -87,7 +87,6 @@ function httpRequest(options, callback) {
 socket.on('pingBoat', function() { socket.emit('pongBoat') })
 
 controllerpy.on('message', function (message) {
-    console.log(message)
     var parse = undefined;
     try {
         parse = JSON.parse(message);
@@ -110,6 +109,7 @@ controllerpy.on('message', function (message) {
         }
         
         var scheepsbrugData = {controllable: controllable, followQuay: followQuay, followCoords: followCoords, ultrasonicSensorData: parse.sensorDistances, boatMotorRudderData: parse.driveValues}
+        console.log(scheepsbrugData)
         queue.push(scheepsbrugData)
     }
 })
