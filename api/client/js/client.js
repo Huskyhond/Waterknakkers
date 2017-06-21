@@ -4,7 +4,7 @@ var socket = io();
 
 
 socket.on('connect', function(){
-    socket.emit('authentication', {token : '918d87a8171860a8e5181a0f249bccff98378278'});
+   socket.emit('authentication', {token : '918d87a8171860a8e5181a0f249bccff98378278'});
 });
 
 socket.on('controlledBoat', function(data) {
@@ -122,6 +122,8 @@ function updateBoats() {
         }
 
         $("<span>").html(" " + boat).appendTo(div);
+        var controllable = (boats[i].controllable) ? 'fa fa-check-circle' : 'fa-times-circle';
+        $("<i>").addClass(controllable).appendTo(div);
         div.appendTo(parent);
     }
 }

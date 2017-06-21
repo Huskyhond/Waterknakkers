@@ -86,18 +86,30 @@ class Api {
         for (var i in instance.connections) {
             var socket = instance.connections[i]
             if (socket.rooms.boats) {
-                boats.push({ id: socket.boatId, name: socket.name })
+                boats.push({ id: socket.boatId, name: socket.name, followQuay: socket.followQuay, followCoords: socket.followCoords, controllable: socket.controllable })
             }
         }
         this.emit('getBoats', { boats: boats })
     }
 
+    /**
+     * Receives and handles information from the boat.
+     * @param {Object} data Data send by boat
+     */
     parseInformation(data) {
         data = instance.formatInput(data)
         if (typeof (data) !== 'object' || Array.isArray(data))
             return
         var collection = instance.db.collection('boatData')
         var _this = this; // Socket this.
+        
+        if(data.followQuay !== undefined)
+            _this.followQuay = data.followQuay
+        if(data.followCoords !== undefined)
+            _this.followCoords = data.followCoords
+        if(data.controllable !== undefined)
+            _this.controllable = data.controllable
+        
         collection.insert(data, function (err, result) {
             if (result.result.n == 1) {
                 instance.io.sockets.emit('info', { id: _this.boatId, name: _this.name, info: data })
