@@ -223,11 +223,11 @@ class Coords():
         dLat = Lat - goalLat
 
         # This is a more precise calculation to calculate if destination is reached
-         if(dLng < 0.00001 or dLng > -0.00001):
-             LngInRange = True
-         if(dLat < 0.00001 or dLat > -0.00001):
-             LatInRange = True
-
+        if(dLng < 0.00001 or dLng > -0.00001):
+            LngInRange = True
+        if(dLat < 0.00001 or dLat > -0.00001):
+            LatInRange = True
+        
         #if(dLng < 0.0001 and dLng > -0.0001):
         #    LngInRange = True
         #if(dLat < 0.0001 and dLat > -0.0001):
