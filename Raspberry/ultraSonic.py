@@ -68,18 +68,21 @@ class Ping:
         while GPIO.input(self.GPIO_PINS[sensor][1]) == 1:
             stop = time.time()
             # Timeout after 0.2s
-            if stop > 0.2:
+            if stop - start > 0.2:
                 return 0
 
         # Calculate the difference in time
         elapsed = stop - start
         # Calculate the measured distance
-        distance = self.smoothDistance((elapsed * self.speedSound) / 2)
+        #distance = self.smoothDistance((elapsed * self.speedSound) / 2)
+        distance = (elapsed*self.speedSound )/2
         # Wait 20ms
         time.sleep(0.02)
         return distance
 
     def smoothDistance(self, distance):
+        bufferSize = 4
+        spikeSize = 4
         if len(self.prevValues) > 0 and abs(distance-self.prevValues[len(self.prevValues)-1]) > self.smoothingRange:
             self.spikeValues.append(distance)
             if len(self.spikeValues) is spikeSize:
@@ -90,7 +93,7 @@ class Ping:
                     else: self.prevValues.pop(0)
                 self.spikeValues = []
             else:
-                continue
+                return sum(self.prevValues)/len(self.prevValues)
         else:
             self.spikeValues = []
             

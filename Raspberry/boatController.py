@@ -9,7 +9,7 @@ class QuayHandle:
 	def __init__(self, controller, followQuay = False):
 		self.followQuay = followQuay
 		self.controller = controller
-		self.instance = Follow(driveBoat, 50, 45, 20, True) # Callback, max_power, sensorAngle, temperature, debug
+		self.instance = Follow(driveBoat, 50, 45, 20, False) # Callback, max_power, sensorAngle, temperature, debug
 	
 	def setTemperature(self, temperature):
 		if self.instance.p is not None:
@@ -30,7 +30,7 @@ class CoordsHandle:
 	def __init__(self, controller, followCoords = False):
 		self.followCoords = followCoords
 		self.controller = controller
-		self.instance = Coords(driveBoat,50,[50,55],False) # Callback, max_power, goal, debug
+		self.instance = Coords(driveBoat,50,[50,55],True) # Callback, max_power, goal, debug
 	
 	def updateCoordsFollow(self, newFollowCoords, max_power, goal):
 		if newFollowCoords is self.followCoords:
