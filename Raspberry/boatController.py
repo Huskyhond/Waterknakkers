@@ -59,12 +59,12 @@ print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.insta
 
 sys.stdout.flush()
 while True:
+	sys.stdout.flush()
 	# Wait for input from NodeJS
 	userinput = sys.stdin.readline()
 	if(not c.connected):
 		c = Controller()
 		print(json.dumps({'controllable': c.controllable}))
-		sys.stdout.flush()
 		sleep(0.5)
 		continue
 	
@@ -122,4 +122,3 @@ while True:
 
 		print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
-	sys.stdout.flush()
