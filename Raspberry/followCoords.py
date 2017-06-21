@@ -14,8 +14,12 @@ import os
 from enum import Enum
 
 #Debug values
-START_COORD = [53, 5]
-GOAL = [[53, 5], [54, 4], [54,6], [52,4], [52,6]]
+#START_COORD = [53, 5]
+#GOAL = [[53, 5], [54, 4], [54,6], [52,4], [52,6]]
+
+#Actual testvalues
+START_COORD = [51.89797260202735, 4.419135396892671]
+GOAL = [[51.89797260202735, 4.419135396892671],[51.89811825005212, 4.422289674694185]]
 
 class Calibration(Enum):
     NORTHOFFSET = 1
@@ -315,4 +319,4 @@ def test():
     while c.running:
         pass
 
-test()
+#test()
