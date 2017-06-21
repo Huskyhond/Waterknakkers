@@ -72,7 +72,7 @@ map.on('click', addMarker);
 var sendCoordinatesButton = L.Control.extend({
 
   options: {
-    position: 'topleft' 
+    position: 'topright' 
     //control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
   },
 
@@ -82,8 +82,8 @@ var sendCoordinatesButton = L.Control.extend({
 	i.className = 'fa fa-location-arrow arrownav';
 	container.appendChild(i);
 	container.setAttribute('title', 'Navigate path');
-	container.style.width = '30px';
-	container.style.height = '30px';
+	container.style.width = '60px';
+	container.style.height = '60px';
 	
 	container.onclick = function(event) {
 		event.preventDefault();
@@ -112,7 +112,7 @@ var sendCoordinatesButton = L.Control.extend({
 var followQuayButton = L.Control.extend({
 
   options: {
-    position: 'topleft' 
+    position: 'topright' 
     //control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
   },
 
@@ -122,8 +122,8 @@ var followQuayButton = L.Control.extend({
 	i.className = 'fa fa-ship arrownav';
 	container.appendChild(i);
 	container.setAttribute('title', 'Follow quay');
-	container.style.width = '30px';
-	container.style.height = '30px';
+	container.style.width = '60px';
+	container.style.height = '60px';
 	
 	container.onclick = function(event) {
 		event.preventDefault();

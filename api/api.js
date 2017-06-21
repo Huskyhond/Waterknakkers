@@ -112,6 +112,7 @@ class Api {
         
         collection.insert(data, function (err, result) {
             if (result.result.n == 1) {
+		console.log('Boat sending data', data)
                 instance.io.sockets.emit('info', { id: _this.boatId, name: _this.name, info: data })
             }
         })
