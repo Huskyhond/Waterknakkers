@@ -50,11 +50,13 @@ def driveBoat(leftEngine, rightEngine, rudder):
 	driveValues = [leftEngine, rightEngine, rudder]
 	c.driveBoat(leftEngine, rightEngine, rudder)
 
+oldControllable = oldFollowQuay = oldFollowCoords = False
 
 print('Running boat Controller')
 c = Controller()
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
+oldControllable = c.controllable
 print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
 sys.stdout.flush()
@@ -127,5 +129,6 @@ while True:
 				coordsHandle.updateCoordsFollow(False,0,[])
 				print('Coords is stopping')
 				
-	print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
+	if oldControllable is not c.controllable or oldFollowCoords is not coordsHandle.instance.running or oldFollowQuay is not quayHandle.instance.running:
+		print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 	sys.stdout.flush()
