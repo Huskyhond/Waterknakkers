@@ -22,7 +22,7 @@ class Follow:
         else: 
             self.p = None
             print("Ping sensors not initialized. OS is not Linux")
-        self.pings = [4,5.66,200]                   # The ping sensor measurement values
+        self.pings = [4,5.66,500]                   # The ping sensor measurement values
 
     def calcAngle(self, sensorDistances):
         x = sensorDistances[0] # The distance from the boat to the Quay wall
@@ -51,7 +51,7 @@ class Follow:
         # Set pings values to the ping sensors measurements
         if isLinux: self.pings = [self.p.measure(2),self.p.measure(1),self.p.measure(0)]
         # If the OS is not linux(raspberry pi), then return default values
-        else: self.pings = [4,5.66,200]
+        else: self.pings = [4,5.66,500]
 
     # Using only 1 sensor
     def adjustBoat2(self):

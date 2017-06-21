@@ -28,10 +28,10 @@ bool takeOver = false;
 
 // Kanalen van de ontvanger
 // Arduino pins
-const int Ch1=A3, // Aileron | Rudder, sturen
-          Ch2=A4, // Rudder | Zorgt voor een draai motion
-          Ch3=A2, // Throttle | Motor kracht
-          Ch5=A1; // Trigger kanaal |  
+const int Ch1=A3, // Rudder, sturen
+          Ch2=A4, // Sturing motoren
+          Ch3=A2, // Motor kracht
+          Ch5=A1; // Trigger kanaal
 
 void setup() 
 {
