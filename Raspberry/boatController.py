@@ -61,11 +61,15 @@ sys.stdout.flush()
 while True:
 	# Wait for input from NodeJS
 	userinput = sys.stdin.readline()
+	print('ik ben gvd gewoon connected')
+	print(c.connected)
 	if(not c.connected):
 		c = Controller()
+		print(json.dumps({'controllable': c.controllable}))
+		sys.stdout.flush()
 		sleep(0.5)
 		continue
-
+	
 	# If the length is more than 1, NodeJS Pushes an empty string time to time and also one character time to time.
 	if(len(userinput) > 1):
 		# Parse to python json object (list)
