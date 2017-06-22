@@ -149,15 +149,20 @@ $(document).ready(function() {
 /**
  * Updates the HTML of the ping from the boat given by the server.
  * @param {String} boatId The id of the boat of which the delay is measured.
- * @param {Int} ping Delay between server and boat
+ * @param {Int} ping Delay between server and boat.
  */
 function setUiPing(boatId, ping) {
 	var parent = $("input[value="+ boatId +"]").parent();
+    // Remove previous ping.
 	parent.find('.ping').remove();
+    // Add new ping.
 	$("<span>").addClass('ping').html(" (" + ping + "ms)").appendTo(parent);
 }
 
-
+/**
+ * Returns boat object based on its ID.
+ * @param {String} id 
+ */
 function getBoatById(id) {
     for(var i in boats) {
         if(boats[i].id == id)
@@ -166,11 +171,14 @@ function getBoatById(id) {
     return false;
 }
 
+/**
+ * Updates the html of the radio and adds controllable state.
+ */
 function updateBoats() {
     var parent = $("#boatRadios");
     parent.empty();
     for(var i in boats) {
-    console.log(boats[i]);
+        // Create div for new boat.
         var div = $('<div>', {
             class: 'boats',
             id: 'boat' + i
@@ -180,32 +188,43 @@ function updateBoats() {
             type: "radio",
             name: "boats"
         }).val(boats[i].id).appendTo(div);
-        
+        // Check if boat was already selected but disconnected and now reconnected.
+        // If so, recheck this checkbox.
         if(boats[i].id == boatSelected){
             radio.attr('checked', 'checked');
             boatSelected = boats[i].id;
-        }
+        } // Otherwise just select the first boat that connects.
         else if(i == 0 && boatSelected == '') {
             radio.attr('checked', 'checked');
             boatSelected = boats[i].id;
         }
-
+        // Add name to the div.
         $("<span>").html(" " + boat + " ").appendTo(div);
+        // Add a icon based on the state of controllable.
         var controllable = (boats[i].controllable) ? 'fa fa-check-circle controllable-state' : 'fa fa-ban controllable-state';
+        // Add that to the div.
         $("<i>").addClass(controllable).appendTo(div);
+        // Append that all to the parent div. (boatRadios)
         div.appendTo(parent);
     }
 }
 
+// Check initial viewport
 var viewport = $( window ).width() - 5;
 var leftWidth = 360;
 
 
+/** 
+ * Set the width based on the screen width.
+ */
 $(document).ready(function() {
     $("#left").width(leftWidth);
     $("#right").width(viewport - leftWidth);
 });
 
+/**
+ * Upon resize resize the width of the view. (making it a scalable application)
+ */
 $(window).resize(function() {
     viewport = $( window ).width() - 5;
     $("#left").width(leftWidth);
