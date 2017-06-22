@@ -156,7 +156,7 @@ De authenticatie procedure een WebSocket connectie bestaat uit een aantal stappe
     ```
     Als de token foutief of niet geldig blijkt te zijn zal de server een ```unautherized``` event sturen. Hierna zal de connectie direct worden verbroken.
 
-    Als de token geldig is zal de server een ```autherized``` event sturen en word de verbinding toegestaan en kunnen de api functies worden aangeroepen.
+    Als de token geldig is zal de server een ```authenticated``` event sturen en word de verbinding toegestaan en kunnen de api functies worden aangeroepen.
 
 *   ```postAuthenticate``` - Hierin staan de functies die aangeroepen kunnen worden nadat de client connected en authorized is.
 
