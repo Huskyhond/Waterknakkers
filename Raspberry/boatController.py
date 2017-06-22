@@ -4,45 +4,60 @@ from followCoords import *
 import sys, json, math
 from time import sleep
 
-
+###
+### Handles the Quay class updates states and feeds information.
+###
 class QuayHandle:
 	def __init__(self, controller, followQuay = False):
-		self.followQuay = followQuay
-		self.controller = controller
+		self.followQuay = followQuay # Set if it should follow quay upon initializing.
+		self.controller = controller # Set controller
+		# Initialize instance.
 		self.instance = Follow(driveBoat, 50, 45, 20, False) # Callback, max_power, sensorAngle, temperature, debug
 	
+	### Get Quay Ping instance and set the temperature.
 	def setTemperature(self, temperature):
 		if self.instance.p is not None:
 			self.instance.p.setTemperature(temperature)
 
+	### Start quay if the state changed.
 	def updateQuayFollow(self, newFollowQuay, maxPower):
 		if newFollowQuay is self.followQuay:
 			return
 		
 		self.followQuay = newFollowQuay
+		# Start thread if true.
 		if self.followQuay:
 			self.instance.start()
-		else:
+		else: # Stop thread if false.
 			self.instance.stop()
 			self.controller.driveBoat(0, 0, 0)
 
+###
+### Handles the Coords class updates states and feeds information.
+###
 class CoordsHandle:
 	def __init__(self, controller, followCoords = False):
 		self.followCoords = followCoords
 		self.controller = controller
-		self.instance = Coords(driveBoat,50,[50,55],False) # Callback, max_power, goal, debug
+		# Initialize instance
+		self.instance = Coords(driveBoat,50,[50,55],False) # Callback, max_power, goalCoordinate, debug
 	
+	# Only update if different than before.
 	def updateCoordsFollow(self, newFollowCoords, max_power, goal):
 		if newFollowCoords is self.followCoords:
 			return
+		# Only start session if there are at least two points. (self + newPosition)
 		elif newFollowCoords and len(goal)>1:
 			self.instance = Coords(driveBoat, max_power, goal, False)
 
+		# Update state
 		self.followCoords = newFollowCoords
+		# Start thread if there are at least two goals.
 		if self.followCoords and len(goal)>1:
 			self.instance.start()
-		else:
+		else: # Stop thread in any other case.
 			self.instance.stop()
+			# Stop the boat.
 			self.controller.driveBoat(0, 0, 0)	
 
 driveValues = [0,0,0]
@@ -53,13 +68,16 @@ def driveBoat(leftEngine, rightEngine, rudder):
 oldControllable = oldFollowQuay = oldFollowCoords = False
 
 print('Running boat Controller')
+# Initalize controller with arduino.
 c = Controller()
+# Initialize class handlers.
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
+# Old controllable state
 oldControllable = c.controllable
 print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
-
+# Flush stdout before we start.
 sys.stdout.flush()
 while True:
 	# Wait for input from NodeJS
@@ -130,10 +148,12 @@ while True:
 			if coordsHandle.instance.running:
 				coordsHandle.updateCoordsFollow(False,0,[])
 				print('Coords is stopping')
-				
+
+	# Only print if the new state is different than the old state.			
 	if c.controllable is not oldControllable or quayHandle.instance.running is not oldFollowQuay or coordsHandle.instance.running is not oldFollowCoords:
 		oldControllable = c.controllable
 		oldFollowQuay = quayHandle.instance.running
 		oldFollowCoords = coordsHandle.instance.running
 		print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
+	# Flush because of the while loop it wont print otherwise.
 	sys.stdout.flush()

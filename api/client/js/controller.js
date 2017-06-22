@@ -1,8 +1,13 @@
+/**
+ * This script uses the Controller API of the browser, most things were written by another author.
+ */
 var haveEvents = 'GamepadEvent' in window;
 var haveWebkitEvents = 'WebKitGamepadEvent' in window;
 var controllers = {};
+// Define the motion that we curently have.
 var oldMotion = { leftEngine: 0, rightEngine: 0, rudder: 0 };
 var followQuay = null;
+// Setup all buttons to a object.
 var xbone = {
     leftTrigger: 0,
     rightTrigger: 0,
@@ -19,6 +24,10 @@ var rAF = window.mozRequestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
     window.requestAnimationFrame;
 
+/**
+ * If the controller connects, then tell the html its connected and add the gamepad.
+ * @param {*} e Event 
+ */
 function connecthandler(e) {
     console.log('connected', e);
     $('.connected_box').addClass("connected");
@@ -26,11 +35,20 @@ function connecthandler(e) {
     addgamepad(e.gamepad);
 }
 
+/**
+ * Add to array of controllers and request animation frame.
+ * @param {Object} gamepad Gamepad object of the event.
+ */
 function addgamepad(gamepad) {
-    controllers[gamepad.index] = gamepad; var d = document.createElement("div");
+    controllers[gamepad.index] = gamepad;
+    // Request animation frame and callback to updateStatus.
     rAF(updateStatus);
 }
 
+/**
+ * On disconnect do the reverse of connect.
+ * @param {*} e Event
+ */
 function disconnecthandler(e) {
     console.log('disconnected');
     $('.connected_box').addClass("disconnected");
@@ -38,12 +56,18 @@ function disconnecthandler(e) {
     removegamepad(e.gamepad);
 }
 
+/**
+ * This is called upon disconnecting and will remove it from the array of controllers.
+ * @param {*} gamepad The gamepad
+ */
 function removegamepad(gamepad) {
-    var d = document.getElementById('controller' + gamepad.index);
-    document.body.removeChild(d);
     delete controllers[gamepad.index];
 }
 
+/**
+ * Set the current values to the xbone object.
+ * @param {*} controller 
+ */
 function updateXbone(controller) {
     for (var i = 0; i < controller.buttons.length; i++) {
         switch (i) {
@@ -87,6 +111,9 @@ function updateXbone(controller) {
     return xbone;
 }
 
+/**
+ * Apply the xbone values and calculate motor and rudder values.
+ */
 var configOne = {
     calibrate: function(xbone) {
         xbone.xLeft = (xbone.xLeft < 0.1 && xbone.xLeft > - 0.1) ? 0 : xbone.xLeft;
@@ -135,9 +162,12 @@ var configThree = {
 }
 
 
-
+// Currently active controller.
 var controllerConfig = configThree;
 
+/**
+ * This is the update called by the browser when a frame is updated.
+ */
 function updateStatus() {
     scangamepads();
     for (j in controllers) {
@@ -145,21 +175,31 @@ function updateStatus() {
         var xboneController = updateXbone(controller);
         var motion = controllerConfig.calculateMotion(xboneController);
         setMotionInHtml(motion);
+        // Only send if its not duplicate.
         if(motion.leftEngine != oldMotion.leftEngine || motion.rightEngine != oldMotion.rightEngine || motion.rudder != oldMotion.rudder) {
-	    var toEmit = {boat: boatSelected, motion: motion };
+	        var toEmit = {boat: boatSelected, motion: motion };
+            // Emit the data to the server and the server to the boat.
             socket.emit('controller', toEmit);
         }
         oldMotion = motion;
     }
+    // Request another frame to the browser.
     rAF(updateStatus);
 }
 
+/**
+ * Change currently set motion in the html
+ * @param {Object} motion Object of motion
+ */
 function setMotionInHtml(motion) {
     $('#motor_one').html(motion.leftEngine.toFixed(2));
     $('#motor_two').html(motion.rightEngine.toFixed(2));
     $('#rudder').html(motion.rudder.toFixed(2));
 }
 
+/**
+ * Scan if a gamepad connects.
+ */
 function scangamepads() {
     var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
     for (var i = 0; i < gamepads.length; i++) {
