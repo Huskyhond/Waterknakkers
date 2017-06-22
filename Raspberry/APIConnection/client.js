@@ -31,13 +31,19 @@ var authenticatedOnly = function () {
         name: config.name
     })
 
+    /**
+     * listens to the server for motion data and sends it to the Rapberry pi
+     * also check wether the controlable state is changed from the server out  
+     * 
+     * @param {Object} - a motion data object obtained from the server
+     */
     socket.on('controller', function (data) {
 	var toSend = data.motion;
 	if(data.followCoords !== undefined) toSend.followCoords = data.followCoords
 	if(data.followQuay !== undefined) toSend.followQuay = data.followQuay
 	if(data.maxPower !== undefined) toSend.maxPower = data.maxPower 
         controllerpy.send(JSON.stringify(toSend))
-        console.log(toSend)
+        console.log('Sending the following to the Python script:', toSend)
     })
 
     setInterval(function () {
@@ -47,7 +53,6 @@ var authenticatedOnly = function () {
             socket.emit('info', data)
         }
     }, 100)
-
 }
 
 socket.on('connect', function () {
@@ -72,6 +77,13 @@ socket.on('disconnect', function () {
     console.log('disconnected')
 })
 
+/**
+ * makes a http request to the configured hostname with the configured parameters
+ * and returns either a error or the body of the request in JSON format
+ * 
+ * @param {Object} options - configuration options for making a HTTP request
+ * @param {Function} callback -  function to return to
+ */
 function httpRequest(options, callback) {
     request(options, function (err, res, body) {
         if (!err && res.statusCode == 200) {
@@ -86,7 +98,22 @@ function httpRequest(options, callback) {
 
 socket.on('pingBoat', function() { socket.emit('pongBoat') })
 
+
+
+/**
+* gets a message from the boatController.py and pushes this into a que where it is then send to the central server.
+* controlable => True = controlable with a controller connected to the webclient 
+*             => False = not controlable with a controller connected to the webclient. Controlable can always be set to False with the R/C controller to take over at any time.
+* followQuay  => True = the boat is in followQuay mode which sets controlable to False
+*             => False = the boat can be in the controlable state or followCoords state
+* followCoords => True = the boat is in the followCoords state which sets controlable to False
+ * 
+ * @param {Object} - a message object from boatController.py containing current information about the boat
+ */
 controllerpy.on('message', function (message) {
+    console.log('-------------- PYTHON -------------')
+    console.log(message)
+    console.log('-------------- END PYTHON -------------')
     var parse = undefined;
     try {
         parse = JSON.parse(message);
@@ -96,8 +123,7 @@ controllerpy.on('message', function (message) {
     }
     if (parse) {
         if (parse.controllable === true || parse.controllable === false) {
-            controllable = parse.controllable
-            console.log('setting controllable to', controllable)
+            controllable = parse.controllable     
         }
         if (parse.followQuay === true || parse.followQuay === false) {
             if (followQuay !== parse.followQuay) queue.push({ followQuay: parse.followQuay })
@@ -109,7 +135,6 @@ controllerpy.on('message', function (message) {
         }
         
         var scheepsbrugData = {controllable: controllable, followQuay: followQuay, followCoords: followCoords, ultrasonicSensorData: parse.sensorDistances, boatMotorRudderData: parse.driveValues}
-        console.log(scheepsbrugData)
         queue.push(scheepsbrugData)
     }
 })
@@ -120,6 +145,15 @@ setInterval(function () {
     gpspy.send()
 }, 1000 / 10)
 
+/**
+ * gets gps location messages at a 10Hz interval and calulates the average location 
+ * over the course of 1 second, after which it pushes it to the queu to be send to the server.
+ * 
+ * we use the first usable location to determine the outside temperature and send it to the raspberry pi
+ * this is done to calibrate ultrasonic sensors.
+ * 
+ * @param {Object} - a message object from get_gps.py containing the current location of the boat. 
+ */
 gpspy.on('message', function (message) {
     var msgParsed = JSON.parse(message)
     gpsIterations++

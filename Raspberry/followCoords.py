@@ -159,9 +159,9 @@ class Coords():
         rudder = 0
 
         if(marge > 10):
-            motorR = self.map(marge, 0, 20, 0, 1)
+            motorR = self.map(marge, 0, 20, 0, self.max_power)
         elif(marge <= 10):
-            motorL = self.map(marge, 0, 20, 0, 1)
+            motorL = self.map(marge, 0, 20, 0, self.max_power)
         
         # marge = abs(self.goalAngle - self.boatAngle) if abs(self.goalAngle - self.boatAngle) < 180 else 360 - abs(self.goalAngle - self.boatAngle)
 
@@ -223,15 +223,15 @@ class Coords():
         dLat = Lat - goalLat
 
         # This is a more precise calculation to calculate if destination is reached
-        # if(dLng < 0.00001 or dLng > -0.00001):
-        #     LngInRange = True
-        # if(dLat < 0.00001 or dLat > -0.00001):
-        #     LatInRange = True
-
-        if(dLng < 0.0001 and dLng > -0.0001):
+        if(dLng < 0.00001 or dLng > -0.00001):
             LngInRange = True
-        if(dLat < 0.0001 and dLat > -0.0001):
+        if(dLat < 0.00001 or dLat > -0.00001):
             LatInRange = True
+        
+        #if(dLng < 0.0001 and dLng > -0.0001):
+        #    LngInRange = True
+        #if(dLat < 0.0001 and dLat > -0.0001):
+        #    LatInRange = True
 
         if(LatInRange and LngInRange):
             return True
@@ -313,7 +313,7 @@ def test():
     """
     Debug tester
     """
-    c = Coords(foo, 50, GOAL, True, Calibration.NORTHOFFSET)
+    c = Coords(foo, 50, GOAL, True)
     c.setPosition(START_COORD)
     c.start()
     while c.running:

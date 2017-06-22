@@ -12,6 +12,10 @@ from time import time
 import os
 
 class IMU:
+    """
+    The IMU Brick by TinkerForge. \n
+    This unit will automatically configure itself to the IMU located in boat Anna.
+    """
     def __init__(self, debug = False):
         self.HOST = "localhost"
         self.PORT = 4223
@@ -22,11 +26,16 @@ class IMU:
         self.imu = BrickIMUV2(self.UID, self.ipcon)
 
     def get_all_data(self):
+        """
+        This will return all data collected by the IMU
+        """
         data = self.imu.get_all_data()
         return data
         
     def connect(self):
-        # Connect the IP connection to the IMU brick
+        """
+        Calling this function will connect the client with the IMU brick.
+        """
         try:
             self.ipcon.connect(self.HOST, self.PORT)
         except Exception:
@@ -37,4 +46,7 @@ class IMU:
         return True
 
     def disconnect(self):
+        """
+        Disconnect from IMU brick
+        """
         self.ipcon.disconnect()

@@ -28,10 +28,10 @@ bool takeOver = false;
 
 // Kanalen van de ontvanger
 // Arduino pins
-const int Ch1=A3, // Aileron | Rudder, sturen
-          Ch2=A4, // Rudder | Zorgt voor een draai motion
-          Ch3=A2, // Throttle | Motor kracht
-          Ch5=A1; // Trigger kanaal |  
+const int Ch1=A3, // Rudder, sturen
+          Ch2=A4, // Sturing motoren
+          Ch3=A2, // Motor kracht
+          Ch5=A1; // Trigger kanaal
 
 void setup() 
 {
@@ -164,18 +164,18 @@ void rpi()
       RechterMotor.write(RM);
 
       //the program then echoes the received commands back to the sender over serial interface
-      if(debug)
-      {
-        Serial.print('a');
-        Serial.print(LR);
-        Serial.print('b');
-        Serial.print(RR);
-        Serial.print('c');  
-        Serial.print(LM);
-        Serial.print('d');  
-        Serial.print(RM);
-        Serial.print('z');   
-      }
+      
+      
+      Serial.print('a');
+      Serial.print(LR);
+      Serial.print('b');
+      Serial.print(RR);
+      Serial.print('c');  
+      Serial.print(LM);
+      Serial.print('d');  
+      Serial.print(RM);
+      Serial.print('z');   
+      
       
     }
     else

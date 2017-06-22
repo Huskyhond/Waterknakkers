@@ -50,22 +50,26 @@ def driveBoat(leftEngine, rightEngine, rudder):
 	driveValues = [leftEngine, rightEngine, rudder]
 	c.driveBoat(leftEngine, rightEngine, rudder)
 
+oldControllable = oldFollowQuay = oldFollowCoords = False
 
 print('Running boat Controller')
 c = Controller()
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
+oldControllable = c.controllable
 print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
+
 
 sys.stdout.flush()
 while True:
-	sys.stdout.flush()
 	# Wait for input from NodeJS
 	userinput = sys.stdin.readline()
 	if(not c.connected):
 		c = Controller()
 		print(json.dumps({'controllable': c.controllable}))
 		sleep(0.5)
+		print('reloop1')
+		sys.stdout.flush()
 		continue
 	
 	# If the length is more than 1, NodeJS Pushes an empty string time to time and also one character time to time.
@@ -75,7 +79,6 @@ while True:
 
 		if 'currentLocation' in jsonObj:
 			coordsHandle.instance.setPosition(jsonObj['currentLocation'])
-			continue
 
 		# Put values in correct variables
 		if 'temperature'  in jsonObj:
@@ -85,8 +88,10 @@ while True:
 			if not quayHandle.instance.running:
 				# Update Quay follower instance
 				quayHandle.setTemperature(temperature)
+			print('reloop3')
+			sys.stdout.flush()
 			continue
-
+	
 		# If controllable send data to arduino.
 		if c.controllable:
 			# Start following the quay wall
@@ -94,14 +99,18 @@ while True:
 				quayHandle.updateQuayFollow(jsonObj['followQuay'], 15)
 			
 			if 'followCoords' in jsonObj and not quayHandle.followQuay:
-				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], 15, jsonObj['goalLocation'])
+				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], 50, jsonObj['goalLocation'])
 			
 			if quayHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'sensorDistances' : quayHandle.instance.pings, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues}))
+				print('reloop4')
+				sys.stdout.flush()
 				continue
 
 			if coordsHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues }))
+				print('reloop5')
+				sys.stdout.flush()
 				continue
 
 			
@@ -110,15 +119,21 @@ while True:
 			if 'leftEngine' in jsonObj and 'rightEngine' in jsonObj and 'rudder' in jsonObj:
 				c.driveBoat(jsonObj['leftEngine'], jsonObj['rightEngine'], jsonObj['rudder'])
 		else:
+			print('Uncontrollable!')
 			# Checks if still uncontrollable.
 			c.check()
 			# Stop the follow quay wall thread if boat is not controllable
 			if quayHandle.instance.running:
 				quayHandle.updateQuayFollow(False, 0)
-
+				print('Quay is stopping')
 			# Stop the follow coords wall thread if boat is not controllable
 			if coordsHandle.instance.running:
 				coordsHandle.updateCoordsFollow(False,0,[])
-
+				print('Coords is stopping')
+				
+	if c.controllable is not oldControllable or quayHandle.instance.running is not oldFollowQuay or coordsHandle.instance.running is not oldFollowCoords:
+		oldControllable = c.controllable
+		oldFollowQuay = quayHandle.instance.running
+		oldFollowCoords = coordsHandle.instance.running
 		print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
-
+	sys.stdout.flush()
