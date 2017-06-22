@@ -6,6 +6,7 @@ from pyparsing import*
 class Controller:
     def __init__(self, port='/dev/ttyACM0',baudrate=115200):
         self.debug = False
+        # Try to connect to the Arduino
         try:
             self.ser=serial.Serial(port,baudrate)
             print('Serial port opened at:',port, 'baudrate:', baudrate)
@@ -21,20 +22,18 @@ class Controller:
             self.controllable = False
             
         print('Connected:',self.connected)
+        # The motor and rudder values to be send to the Arduino
         self.motorL=90
         self.motorR=90
         self.rudderL=90
         self.rudderR=90
 
+    # Write the motor and rudder values to the Arduino
     def write(self):
-        """
-            Write values to arduino
-            LR,RR,LM,RM
-        """
-        #constructs a string to send to the arduino
+        # Constructs a string to send to the arduino
         writeValues = 'a'+str(int(self.rudderL))+'b'+str(int(self.rudderR))+'c'+str(int(self.motorL))+'d'+str(int(self.motorR))+'z'
         
-        #send string to arduino
+        # Send string to arduino
         if self.debug: print('write:',writeValues)
         self.ser.write(str.encode(writeValues))
 
@@ -45,13 +44,14 @@ class Controller:
         echo=self.ser.read(self.ser.inWaiting())
         if self.debug: print('echo:',echo)
 
+        # Check if the write and echo string are equal
         try:
             # Check if echo equals the writeValues
             if str.encode(writeValues) in echo:
                 if self.debug: print('Correct echo received')
                 return True
             else:
-                #no data received from arduino, or incorrect format
+                # No data received from Arduino, or incorrect format
                 if self.debug: print('Incorrect or empty echo from arduino received')
                 self.controllable = False
                 return False
@@ -59,6 +59,7 @@ class Controller:
             if self.debug: print('Error comparing writeValues and echo.', 'writeValues:',str.encode(writeValues), 'echo:',echo)
             return False
 
+    # Check if Arduino is listening to the Raspberry pi
     def check(self):
         if self.driveBoat(0,0,0):
             self.controllable = True
@@ -68,6 +69,7 @@ class Controller:
         if self.debug:
             print('Check:', self.controllable)
 
+    # Set motor and rudder values and write them to the Arduino
     def driveBoat(self, motorL, motorR, rudder):
         self.driveMotor(motorL,motorR)
         self.driveRudder(rudder)
@@ -77,10 +79,13 @@ class Controller:
             print("Cannot write to boat")
             self.controllable = False
 
+    # Change incoming value ranging from -1 and 1 to acceptable pwm values
     def driveMotor(self, motorL, motorR):
+        # Turn around motorL and motorR values
         tmp = motorL
         motorL = motorR
         motorR = tmp
+
         motorL = motorL * 100
         motorR = motorR * 100
         motorL = np.clip(motorL,-100,100) / 2
@@ -89,9 +94,11 @@ class Controller:
         self.motorL=90+motorL
         self.motorR=90+motorR
 
-
+    # Change incoming rudder value ranging from -1 and 1 to acceptable pwm value
     def driveRudder(self, angle):
-        angle = angle * -1 # Reverse angle value
+        # Reverse angle value
+        angle = angle * -1 
+
         angle = angle * 100
         angle = np.clip(angle, -100, 100) / 2
         self.rudderL = self.rudderR = 90 + angle
