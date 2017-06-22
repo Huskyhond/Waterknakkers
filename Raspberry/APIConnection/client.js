@@ -157,17 +157,17 @@ setInterval(function () {
 gpspy.on('message', function (message) {
     var msgParsed = JSON.parse(message)
     gpsIterations++
-    latT += msgParsed[0]
+    latT += msgParsed[0] // totaled gps values
     lngT += msgParsed[1]
 
     // On rec of a coordinate.
     if (gpsIterations > 9) { // Send location every second (location is average of 10 calls)
-        var lat = latT / gpsIterations
+        var lat = latT / gpsIterations //after 10 iteration calculate the average
         var lng = lngT / gpsIterations
 
 
         if (initialize && lng > 0) { // get the innitial location of the boat to determine outside temperature
-            temperatureRequestOptions.qs.lat = lat
+            temperatureRequestOptions.qs.lat = lat // prepare the http options to get an accurate temperature indication
             temperatureRequestOptions.qs.lon = lng
 
             httpRequest(temperatureRequestOptions, function (data) {

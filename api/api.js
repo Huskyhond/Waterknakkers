@@ -10,14 +10,28 @@ class Api {
 	this.pingBoats()
     }
 
+
+    /**
+     * set the database variable to a database object we want to use in this instance of the API
+     * 
+     * @param {Object} db - a database object. in our implementation we used MongoDB 
+     */
     setDatabase(db) {
         this.db = db
     }
 
+    /**
+     * adds an incomming socket io connection object to the current connection list
+     * 
+     * @param {Object} socket - a socket io connection object 
+     */
     addConnection(socket) {
         instance.connections.push(socket)
     }
 
+    /**
+     * sends a ping to every boat connected to the servver in a 2 second interval
+     */
     pingBoats() {
 	setInterval(function() {
 		var boats = instance.getBoatConnections()
@@ -33,6 +47,10 @@ class Api {
 	instance.io.sockets.emit('pong', { boat: this.boatId, ping: ping })
     }
 
+
+    /**
+     * get all currently connected boats and returns them.
+     */
     getBoatConnections() {
 	var boats = []
 	for(var i = 0; i < instance.connections.length; i++) {
@@ -43,6 +61,11 @@ class Api {
 	return boats;
     }
 
+    /**
+     * returns a specific cconnection identified by an id parameter
+     * 
+     * @param {String} id - an id string to identify the connection 
+     */
     getConnection(id) {
         for (var i = 0; i < instance.connections.length; i++) {
             if (instance.connections[i].boatId == id) {
@@ -52,6 +75,12 @@ class Api {
         return false;
     }
 
+
+    /**
+     * Listens to motion data obtained from the webclient and sends it to that specific boat
+     * 
+     * @param {Object} data - motion data object obtainted from the webclient 
+     */
     onMotion(data) {
         data = instance.formatInput(data)
         console.log('Sending data to boat', data)
@@ -63,6 +92,13 @@ class Api {
         }
     }
 
+    /**
+     * 
+     * @param {Object} options - options object containing a name, boatId and a isBoat boolean
+     *  @param {String} options.name - name of the boat
+     *  @param {String} options.boatId - unique id of the boat
+     *  @param {Boolean} options.isBoat - wether the connecting party is a actual boat or not
+     */
     joinBoat(options) {
         options = instance.formatInput(options)
         console.log("Boat connected")
@@ -73,6 +109,9 @@ class Api {
         instance.io.sockets.emit('boatConnected', { boat: { id: this.boatId, name: this.name } })
     }
 
+    /**
+     * listens to disconnect events and removes the connection from the connections list
+     */
     disconnect() {
         if (this.isBoat) {
             instance.io.sockets.emit('boatDisconnected', { boat: { id: this.boatId, name: this.name } })
@@ -81,6 +120,9 @@ class Api {
         instance.connections.splice(index, 1)
     }
 
+    /**
+     * emits all the currently connected boats to the requesting party
+     */
     getBoats() {
         var boats = []
         for (var i in instance.connections) {
@@ -94,7 +136,7 @@ class Api {
 
     /**
      * Receives and handles information from the boat.
-     * @param {Object} data Data send by boat
+     * @param {Object} data - Data send by boat
      */
     parseInformation(data) {
         data = instance.formatInput(data)
