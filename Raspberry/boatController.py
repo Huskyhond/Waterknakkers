@@ -60,11 +60,16 @@ class CoordsHandle:
 			# Stop the boat.
 			self.controller.driveBoat(0, 0, 0)	
 
+# The array which stores the engine and rudder values
 driveValues = [0,0,0]
+# The callback for followQuay and followCoords
+# The callback stores the incoming engine and rudder values in driveValues,
+# and uses these values to drive the boat using driveBoat() of Control.py
 def driveBoat(leftEngine, rightEngine, rudder):
 	driveValues = [leftEngine, rightEngine, rudder]
 	c.driveBoat(leftEngine, rightEngine, rudder)
 
+# Old states of controllable, followQuay and followCoords
 oldControllable = oldFollowQuay = oldFollowCoords = False
 
 print('Running boat Controller')
@@ -73,7 +78,7 @@ c = Controller()
 # Initialize class handlers.
 quayHandle = QuayHandle(c)
 coordsHandle = CoordsHandle(c)
-# Old controllable state
+# Set old controllable state
 oldControllable = c.controllable
 print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running}))
 
@@ -86,7 +91,6 @@ while True:
 		c = Controller()
 		print(json.dumps({'controllable': c.controllable}))
 		sleep(0.5)
-		print('reloop1')
 		sys.stdout.flush()
 		continue
 	
@@ -95,6 +99,7 @@ while True:
 		# Parse to python json object (list)
 		jsonObj = json.loads(userinput)
 
+		# Set currentLocation of followCoords
 		if 'currentLocation' in jsonObj:
 			coordsHandle.instance.setPosition(jsonObj['currentLocation'])
 
@@ -106,7 +111,6 @@ while True:
 			if not quayHandle.instance.running:
 				# Update Quay follower instance
 				quayHandle.setTemperature(temperature)
-			print('reloop3')
 			sys.stdout.flush()
 			continue
 	
@@ -116,18 +120,19 @@ while True:
 			if 'followQuay' in jsonObj and not coordsHandle.followCoords:
 				quayHandle.updateQuayFollow(jsonObj['followQuay'], 15)
 			
+			# Start following coordinates
 			if 'followCoords' in jsonObj and not quayHandle.followQuay:
 				coordsHandle.updateCoordsFollow(jsonObj['followCoords'], 50, jsonObj['goalLocation'])
 			
+			# Print the states and engine,rudder,sensor values if followQuay is running
 			if quayHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'sensorDistances' : quayHandle.instance.pings, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues}))
-				print('reloop4')
 				sys.stdout.flush()
 				continue
-
+			
+			# Print states and engine and rudder values
 			if coordsHandle.instance.running:
 				print(json.dumps({'controllable': c.controllable, 'followQuay': quayHandle.instance.running, 'followCoords': coordsHandle.instance.running, 'driveValues': driveValues }))
-				print('reloop5')
 				sys.stdout.flush()
 				continue
 
