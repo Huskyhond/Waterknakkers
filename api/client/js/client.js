@@ -3,33 +3,62 @@ var boatSelected = '';
 var socket = io();
 
 
+/**
+ * Connect to the server and authenticate as a client.
+ * The token is from the database and will be checked.
+ */
 socket.on('connect', function(){
    socket.emit('authentication', {token : '918d87a8171860a8e5181a0f249bccff98378278'});
 });
 
+/**
+ * If another client controls the boat, this will be called.
+ * @param {Object} data Data received from the server.
+ */
 socket.on('controlledBoat', function(data) {
-    console.log(data)
+    // Only show this data if this boat is selected.
     if(data.boat != boatSelected) return;
+    // Update html.
     $('#motor_one').html(data.motion.leftEngine.toFixed(2));
     $('#motor_two').html(data.motion.rightEngine.toFixed(2));
     $('#rudder').html(data.motion.rudder.toFixed(2));
 })
 
+/**
+ * This is called after the authentication succeeded, after we know it succeeded we can stat emitting.
+ */
 socket.on('authenticated', function (){
     console.log('client authenticated!');
+    // Ask which boats are connected.
     socket.emit('getBoats');
 })
 
+/**
+ * Authentication failed, we do no more here but log it in the console to know what went wrong.
+ * @param {Object} err Error received from the server.
+ */
 socket.on('unauthorized', function (err) {
     console.log(err)
 })
+
 var dt = Date.now();
 
+/**
+ * The server gives the reaction time between a boat and the server.
+ * Note! The ping is the delay from server to boat, not from server to client.
+ * @param {Object} data Data received from the server.
+ */
 socket.on('pong', function(data) {
 	console.log("received Pong:", data)
+    // Set this ping next to boat's name.
 	setUiPing(data.boat, data.ping);
 });
 
+/**
+ * All the info a boat gives to the server will be forwarded to all listening clients.
+ * Here we can receive the GPS coordinates or sensor data from the boat.
+ * @param {Object} data Data received from the server.
+ */
 socket.on('info', function(data) {
     if(data.id == boatSelected) {
         $('#console').append('<div>' + JSON.stringify(data.info) + '</div>');
@@ -41,31 +70,53 @@ socket.on('info', function(data) {
     }
 })
 
+/**
+ * After the socket.emit('getBoats') is send to the server, the server will return all the boats that are already connected.
+ * @param {Array} boatsin All the boats currently connected to the server.
+ */
 socket.on('getBoats', function(boatsin) {
     for(var i in boatsin.boats) {
+        // Add to the local list of boats.
         boats.push(boatsin.boats[i]);
-	setFollowStates(boatsin.boats[i]);
+        // Updates the current followStates 'FollowQuay' and 'FollowCoords'. (Since the boat could already be in a session)
+	    setFollowStates(boatsin.boats[i]);
     }
+    // Update all the html of the boats based on the boats array.
     updateBoats();
 });
 
+/**
+ * Boat connected post connect, add it to the array of boats.
+ * @param {Object} boat A single boat.
+ */
 socket.on('boatConnected', function(boat) {
     boats.push(boat.boat);
+    // Update all the html of the boats based on the boats array.
     updateBoats();
 });
 
+/**
+ * If a boat is disconnected from the server, either by turning off or by losing connection.
+ * @param {Object} boat A single boat.
+ */
 socket.on('boatDisconnected', function(boat) {
     var boat = boat.boat;
     for(var i in boats) {
         var _boat = boats[i];
+        // Remove the boat from the array of boats.
         if(_boat.id == boat.id) {
             boats.splice(i, 1);
         }
     }
+    // Update all the html of the boats based on the boats array.
     updateBoats();
 });
 
+/**
+ * When page loaded.
+ */
 $(document).ready(function() {
+    // On listener for the controller input, you can change which controller configuration you want to use.
     $('input[type=radio][name=controller]').change(function() {
         if (this.value == 'c1') {
             controllerConfig = configOne;
@@ -78,17 +129,24 @@ $(document).ready(function() {
         }
     });
 
+    // If the selected boat changes, update the selected boat value.
     $('#boatRadios').on('change', 'input[type=radio][name=boats]', function() {
         boatSelected = this.value;
     });
 
 });
 
+/**
+ * Updates the HTML of the ping from the boat given by the server.
+ * @param {String} boatId The id of the boat of which the delay is measured.
+ * @param {Int} ping Delay between server and boat
+ */
 function setUiPing(boatId, ping) {
 	var parent = $("input[value="+ boatId +"]").parent();
 	parent.find('span').remove()
 	$("<span>").html(getBoatById(boatId).name + " (" + ping + "ms)").appendTo(parent);
 }
+
 
 function getBoatById(id) {
     for(var i in boats) {
